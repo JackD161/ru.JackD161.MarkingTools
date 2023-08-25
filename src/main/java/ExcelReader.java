@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 // класс читает данные из Excell файла и возвращает массив из номера строки и списка содержимого строки по ячейкам
 public class ExcelReader {
 
@@ -93,16 +92,6 @@ public class ExcelReader {
             case BOOLEAN -> dataRow.add(cell.getBooleanCellValue());
             case FORMULA -> dataRow.add(cell.getCellFormula());
             default -> dataRow.add(" ");
-        }
-    }
-
-    public void toScreen() {
-        for (Map.Entry<Integer, List<Object>> pair : data.entrySet()) {
-            System.out.print(pair.getKey() + " / ");
-            for (Object object : pair.getValue()) {
-                System.out.print(object.toString() + " * ");
-            }
-            System.out.println();
         }
     }
 

@@ -16,7 +16,7 @@ public class FileWorker {
             }
         }
         catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Ошибка загрузки файла");
         }
     }
     private void saveParserDataToFile(String fileName, ArrayList<String> result) {
@@ -26,7 +26,7 @@ public class FileWorker {
             }
         }
         catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Ошибка сохранения файла");
         }
     }
 
