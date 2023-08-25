@@ -42,10 +42,12 @@ public class Generate415xml {
                 "    <doc_date>" + docDate + "</doc_date>\n" +
                 "    <turnover_type>" + turnoverType + "</turnover_type>\n" +
                 "    <source>" + financeType + "</source>\n" +
-                "    <contract_type>" + contractType + "</contract_type>\n" +
-                "    <contract_gos_num>" + gosNum + "</contract_gos_num>\n" +
-                "    <contract_gos_date>" + gosDate + "</contract_gos_date>\n" +
-                "    <order_details>\n");
+                "    <contract_type>" + contractType + "</contract_type>\n");
+        if (!gosDate.isBlank() || !gosNum.isBlank()) {
+            xml.append("    <contract_gos_num>" + gosNum + "</contract_gos_num>\n" +
+                    "    <contract_gos_date>" + gosDate + "</contract_gos_date>\n");
+        }
+        xml.append("    <order_details>\n");
         for (Map.Entry<Integer, List<Object>> pair : mapSgtin.entrySet()) {
             xml.append("      <union>\n" +
                     "        <sgtin>" + pair.getValue().get(0) + "</sgtin>\n" +

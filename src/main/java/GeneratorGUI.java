@@ -9,31 +9,48 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class GeneratorGUI {
+    private final String version = "1.1 alpha";
     private JFrame window;
+    private JLabel srcFileLabel;
     private JTextField srcFile;
+    private JLabel outFileLAbel;
     private JTextField outFile;
+    private JLabel senderMDLabel;
     private JTextField senderMD;
+    private JLabel receiverMDLabel;
     private JTextField receiverMD;
+    private JLabel dateOperateLabel;
     private JTextField dateOperate;
     private JTextArea outputField;
-    private final JButton xml415;
-    private final JButton xml701;
-    private final JButton xml251;
-    private final JButton xml431;
-    private final JButton dateOperateNow;
-    private final JButton docDateNow;
-    private final JButton gosDateNow;
+    private JButton xml415;
+    private JButton xml701;
+    private JButton xml251;
+    private JButton xml431;
+    private JButton dateOperateNow;
+    private JButton docDateNow;
+    private JButton gosDateNow;
+    private JButton reset;
+    private JButton confirm;
+    private JButton clipboard;
     private int xmlNumber;
+    private JLabel gosNumLabel;
     private JTextField gosNum;
+    private JLabel gosDateLabel;
     private  JTextField gosDate;
+    private JLabel docNumLabel;
     private  JTextField docNum;
+    private JLabel docDateLabel;
     private  JTextField docDate;
     private final JPanel center;
+    private JLabel reasonRecallLabel;
     private JTextField reasonRecall;
     private HashMap<String, JTextField> fieldsMap;
     private HashMap<String, JLabel> labelsMap;
+    private JLabel contractTypeLabel;
     private JComboBox<ContractTypeEnum> contractTypeBox;
+    private JLabel financeTypeLabel;
     private JComboBox<FinanceTypeEnum> financeTypeBox;
+    private JLabel turnoverTypeLabel;
     private JComboBox<TurnoverTypeEnum> turnoverTypeBox;
     private final String[] schema251 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "reasonRecall"};
     private final String[] schema701 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate"};
@@ -47,23 +64,7 @@ public class GeneratorGUI {
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(outputField);
-        JButton reset = new JButton("Сброс");
-        JButton confirm = new JButton("Генерация");
-        JButton clipboard = new JButton("В буффер");
-        xml415 = new JButton("415");
-        xml701 = new JButton("701");
-        xml251 = new JButton("251");
-        xml431 = new JButton("431");
-        dateOperateNow = new JButton("Сейчас");
-        docDateNow = new JButton("Сегодня");
-        gosDateNow = new JButton("Сегодня");
-        xml415.setBackground(Color.WHITE);
-        xml701.setBackground(Color.WHITE);
-        xml251.setBackground(Color.WHITE);
-        xml431.setBackground(Color.WHITE);
-        confirm.setBackground(Color.GREEN);
-        clipboard.setBackground(Color.MAGENTA);
-        reset.setBackground(Color.RED);
+
         JMenuBar bar = new JMenuBar();
         JMenu file = new JMenu("Файл");
         JMenu help = new JMenu("Помощь");
@@ -81,10 +82,10 @@ public class GeneratorGUI {
         JPanel right = new JPanel();
         JPanel left = new JPanel();
 
-        left.add(xml415);
-        left.add(xml701);
         left.add(xml251);
+        left.add(xml415);
         left.add(xml431);
+        left.add(xml701);
 
         right.add(scrollPane);
 
@@ -106,6 +107,7 @@ public class GeneratorGUI {
             xmlNumber = 415;
             bleachingButtons();
             xml415.setBackground(Color.ORANGE);
+            schema415LabelsNaming();
             generateForm(schema415);
             initComboBoxFor415();
         });
@@ -114,6 +116,7 @@ public class GeneratorGUI {
             xmlNumber = 701;
             bleachingButtons();
             xml701.setBackground(Color.ORANGE);
+            schema701LabelsNaming();
             generateForm(schema701);
         });
         xml251.addActionListener(e -> {
@@ -121,6 +124,7 @@ public class GeneratorGUI {
             xmlNumber = 251;
             bleachingButtons();
             xml251.setBackground(Color.ORANGE);
+            schema251LabelsNaming();
             generateForm(schema251);
         });
         xml431.addActionListener(e -> {
@@ -128,9 +132,11 @@ public class GeneratorGUI {
             xmlNumber = 431;
             bleachingButtons();
             xml431.setBackground(Color.ORANGE);
+            schema431LabelsNaming();
             generateForm(schema431);
         });
         reset.addActionListener(e -> {
+            clearLabelsNaming();
             clearFields();
             bleachingFields();
             bleachingButtons();
@@ -151,7 +157,7 @@ public class GeneratorGUI {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             gosDate.setText(time.format(formatter));
         });
-        aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window, "Версия генератора МДЛП документов 1.0 alpha"));
+        aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window, "Версия генератора МДЛП документов " + version));
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             new SaveXMLfile(outFile.getText(), "Document" + xmlNumber + ".xml", outputField.getText());
@@ -197,20 +203,77 @@ public class GeneratorGUI {
             }
         });
     }
+    private void clearLabelsNaming() {
+        srcFileLabel.setText("");
+        outFileLAbel.setText("");
+        senderMDLabel.setText("");
+        receiverMDLabel.setText("");
+        dateOperateLabel.setText("");
+        gosNumLabel.setText("");
+        gosDateLabel.setText("");
+        docNumLabel.setText("");
+        docDateLabel.setText("");
+        contractTypeLabel.setText("");
+        financeTypeLabel.setText("");
+        turnoverTypeLabel.setText("");
+        window.setTitle("Генератор МДЛП документа");
+    }
+    private void schema415LabelsNaming() {
+        srcFileLabel.setText("Файл Excell c данными SGTIN и отгрузочными ценами");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        receiverMDLabel.setText("Идентификатор организации-получателя");
+        dateOperateLabel.setText("Дата отгрузки");
+        gosNumLabel.setText("Номер государственного контракта");
+        gosDateLabel.setText("Дата государственного контракта");
+        docNumLabel.setText("Реквизиты документа отгрузки: номер документа");
+        docDateLabel.setText("Реквизиты документа отгрузки: дата документа");
+        contractTypeLabel.setText("Тип договора");
+        financeTypeLabel.setText("Источник финансирования");
+        turnoverTypeLabel.setText("Тип операции отгрузки со склада");
+        window.setTitle("Отгрузка ЛП со склада");
+    }
+    private void schema251LabelsNaming() {
+        srcFileLabel.setText("Файл Excell c данными SGTIN");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        receiverMDLabel.setText("Идентификатор организации-получателя");
+        dateOperateLabel.setText("Дата совершения операции");
+        reasonRecallLabel.setText("Причина отзыва");
+        window.setTitle("Отзыв части товара отправителем");
+    }
+    private void schema431LabelsNaming() {
+        srcFileLabel.setText("Файл Excell c данными SGTIN");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        receiverMDLabel.setText("Идентификатор организации-получателя");
+        dateOperateLabel.setText("Дата совершения операции");
+        docNumLabel.setText("Реквизиты документа перемещения: номер документа");
+        docDateLabel.setText("Реквизиты документа перемещения: дата документа");
+        window.setTitle("Перемещение");
+    }
+    private void schema701LabelsNaming() {
+        srcFileLabel.setText("Файл Excell c данными SGTIN");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        receiverMDLabel.setText("Идентификатор контрагента");
+        dateOperateLabel.setText("Дата совершения операции");
+        window.setTitle("Подтверждение отгрузки / приемки");
+    }
     private void initLabels() {
-        JLabel srcFileLabel = new JLabel("Файл источник SGTIN и цен");
-        JLabel outFileLAbel = new JLabel("Путь куда сохранить");
-        JLabel senderMDLabel = new JLabel("МД отправителя");
-        JLabel receiverMDLabel = new JLabel("МД получателя");
-        JLabel dateOperateLabel = new JLabel("Дата совершения операции");
-        JLabel gosNumLabel = new JLabel("Номер госконтракта");
-        JLabel gosDateLabel = new JLabel("Дата госконтракта");
-        JLabel docNumLabel = new JLabel("Номер документа");
-        JLabel docDateLabel = new JLabel("Дата документа");
-        JLabel reasonRecallLabel = new JLabel("Причина отзыва");
-        JLabel contractTypeLabel = new JLabel("Тип контракта");
-        JLabel financeTypeLabel = new JLabel("Тип финансирования");
-        JLabel turnoverTypeLabel = new JLabel("Действие");
+        srcFileLabel = new JLabel();
+        outFileLAbel = new JLabel();
+        senderMDLabel = new JLabel();
+        receiverMDLabel = new JLabel();
+        dateOperateLabel = new JLabel();
+        gosNumLabel = new JLabel();
+        gosDateLabel = new JLabel();
+        docNumLabel = new JLabel();
+        docDateLabel = new JLabel();
+        reasonRecallLabel = new JLabel();
+        contractTypeLabel = new JLabel();
+        financeTypeLabel = new JLabel();
+        turnoverTypeLabel = new JLabel();
         labelsMap.put("srcFile", srcFileLabel);
         labelsMap.put("outFile", outFileLAbel);
         labelsMap.put("senderMD", senderMDLabel);
@@ -230,7 +293,7 @@ public class GeneratorGUI {
         outFile = new JTextField(30);
         senderMD = new JTextField(30);
         receiverMD = new JTextField(30);
-        dateOperate = new JTextField(22);
+        dateOperate = new JTextField(24);
         outputField = new JTextArea(30, 30);
         gosNum = new JTextField(30);
         gosDate = new JTextField(22);
@@ -262,6 +325,25 @@ public class GeneratorGUI {
         center.add(turnoverTypeBox);
         repaint();
     }
+    private void initButtons() {
+        reset = new JButton("Сброс");
+        confirm = new JButton("Генерация");
+        clipboard = new JButton("В буффер");
+        xml415 = new JButton("415");
+        xml701 = new JButton("701");
+        xml251 = new JButton("251");
+        xml431 = new JButton("431");
+        dateOperateNow = new JButton("Сейчас");
+        docDateNow = new JButton("Сегодня");
+        gosDateNow = new JButton("Сегодня");
+        xml415.setBackground(Color.WHITE);
+        xml701.setBackground(Color.WHITE);
+        xml251.setBackground(Color.WHITE);
+        xml431.setBackground(Color.WHITE);
+        confirm.setBackground(Color.GREEN);
+        clipboard.setBackground(Color.MAGENTA);
+        reset.setBackground(Color.RED);
+    }
     private void bleachingFields() {
         srcFile.setBackground(Color.WHITE);
         outFile.setBackground(Color.WHITE);
@@ -290,6 +372,7 @@ public class GeneratorGUI {
         docNum.setText("");
         docDate.setText("");
         outputField.setText("");
+        reasonRecall.setText("");
     }
     private void generateForm(String[] list) {
         for (String field : list) {
@@ -319,6 +402,7 @@ public class GeneratorGUI {
         labelsMap = new HashMap<>();
         initLabels();
         initTextFields();
+        initButtons();
         xmlNumber = 0;
     }
 
