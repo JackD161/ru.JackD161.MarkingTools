@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class GeneratorGUI {
-    private final String version = "1.2 alpha";
+    private final String version = "1.2 alpha\n" +
+            "Разработчик: Холопкин Юрий (JackD161)\n" +
+            "e-mail: holopkin_yurik@mail.ru";
     private JFrame window;
     private JLabel srcFileLabel;
     private JTextField srcFile;
@@ -66,7 +68,7 @@ public class GeneratorGUI {
 
     public GeneratorGUI() {
         initFrame();
-        window.setBounds(200, 300, 900, 800);
+        window.setBounds(300, 100, 900, 800);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(outputField);
@@ -77,9 +79,11 @@ public class GeneratorGUI {
         JMenuItem saveAs = new JMenuItem("Сохранить результат как...");
         JMenuItem exit = new JMenuItem("Выход");
         JMenuItem aboutIt = new JMenuItem("О программе");
+        JMenuItem instruction = new JMenuItem("Описание работы");
         file.add(saveAs);
         file.add(exit);
         help.add(aboutIt);
+        help.add(instruction);
         bar.add(file);
         bar.add(help);
 
@@ -118,7 +122,6 @@ public class GeneratorGUI {
             xml415.setBackground(Color.ORANGE);
             schema415LabelsNaming();
             generateForm(schema415);
- //           initComboBox();
         });
         xml701.addActionListener(e -> {
             reset.doClick();
@@ -175,7 +178,16 @@ public class GeneratorGUI {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
             gosDate.setText(time.format(formatter));
         });
-        aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window, "Версия генератора МДЛП документов " + version));
+        aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window,"Версия генератора МДЛП документов " + version));
+        instruction.addActionListener(e -> {
+            JOptionPane.showMessageDialog(window,"Инструменты для работы с маркировкой ЛС\n" +
+                            "\n" +
+                            "Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.\n" +
+                            "Генератор работает с Excell файлами, из которых читает данные. Файл должен содержать информацию по колонкам:\n" +
+                            "SGTIN | Цена отгрузки включая налог | НДС 10%/20%\n" +
+                            "Цена отгрузки и НДС используются только для формирования 415 и 702 документов,\n" +
+                            "величина НДС рассчитывается от цены отгрузки, для остальных документов используется только первая колонка.\n");
+                });
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
