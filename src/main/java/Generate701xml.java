@@ -23,7 +23,7 @@ public class Generate701xml {
                 "  <accept action_id=\"701\">\n" +
                 "    <subject_id>" + senderMD + "</subject_id>\n" +
                 "    <counterparty_id>" + receiverMD + "</counterparty_id>\n" +
-                "    <operation_date>" + dateOperate + "/operation_date>\n" +
+                "    <operation_date>" + dateOperate + "</operation_date>\n" +
                 "    <order_details>\n");
         for (Map.Entry<Integer, List<Object>> pair : mapSgtin.entrySet()) {
             xml.append("      <sgtin>").append(pair.getValue().get(0)).append("</sgtin>\n");
