@@ -12,6 +12,19 @@ public class GeneratorGUI {
     private final String version = "1.2 alpha\n" +
             "Разработчик: Холопкин Юрий (JackD161)\n" +
             "e-mail: holopkin_yurik@mail.ru";
+    private final String instruct = "Инструменты для работы с маркировкой ЛС\n" +
+            "\n" +
+            "Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.\n" +
+            "Генератор работает с Excell файлами, из которых читает данные. Файл должен содержать информацию по колонкам:\n" +
+            "SGTIN | Цена отгрузки включая налог | НДС 10%/20%\n" +
+            "Цена отгрузки и НДС используются только для формирования 415 и 702 документов,\n" +
+            "величина НДС рассчитывается от цены отгрузки, для остальных документов используется только первая колонка.\n";
+    private final String descriptionSchemas = "251 - Отзыв части товара отправителем\n" +
+            "415 - Отгрузка ЛП со склада\n" +
+            "417 - Возврат приостановленных лекарственных препаратов\n" +
+            "431 - Перемещение\n" +
+            "701 - Подтверждение отгрузки / приемки\n" +
+            "702 - Оприходование\n";
     private JFrame window;
     private JLabel srcFileLabel;
     private JTextField srcFile;
@@ -33,6 +46,7 @@ public class GeneratorGUI {
     private JButton xml251;
     private JButton xml431;
     private JButton xml702;
+    private JButton xml417;
     private JButton dateOperateNow;
     private JButton docDateNow;
     private JButton gosDateNow;
@@ -64,6 +78,7 @@ public class GeneratorGUI {
     private final String[] schema431 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
     private final String[] schema415 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate"};
     private final String[] schema702 = {"srcFile", "outFile", "senderMD", "inn", "kpp", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate"};
+    private final String[] schema417 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
     private ZonedDateTime time;
 
     public GeneratorGUI() {
@@ -80,10 +95,12 @@ public class GeneratorGUI {
         JMenuItem exit = new JMenuItem("Выход");
         JMenuItem aboutIt = new JMenuItem("О программе");
         JMenuItem instruction = new JMenuItem("Описание работы");
+        JMenuItem opisanie = new JMenuItem("Описание схем документов");
         file.add(saveAs);
         file.add(exit);
         help.add(aboutIt);
         help.add(instruction);
+        help.add(opisanie);
         bar.add(file);
         bar.add(help);
 
@@ -94,6 +111,7 @@ public class GeneratorGUI {
 
         left.add(xml251);
         left.add(xml415);
+        left.add(xml417);
         left.add(xml431);
         left.add(xml701);
         left.add(xml702);
@@ -147,6 +165,14 @@ public class GeneratorGUI {
             schema431LabelsNaming();
             generateForm(schema431);
         });
+        xml417.addActionListener(e -> {
+            reset.doClick();
+            xmlNumber = 417;
+            bleachingButtons();
+            xml417.setBackground(Color.ORANGE);
+            schema417LabelsNaming();
+            generateForm(schema417);
+        });
         xml702.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 702;
@@ -180,14 +206,11 @@ public class GeneratorGUI {
         });
         aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window,"Версия генератора МДЛП документов " + version));
         instruction.addActionListener(e -> {
-            JOptionPane.showMessageDialog(window,"Инструменты для работы с маркировкой ЛС\n" +
-                            "\n" +
-                            "Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.\n" +
-                            "Генератор работает с Excell файлами, из которых читает данные. Файл должен содержать информацию по колонкам:\n" +
-                            "SGTIN | Цена отгрузки включая налог | НДС 10%/20%\n" +
-                            "Цена отгрузки и НДС используются только для формирования 415 и 702 документов,\n" +
-                            "величина НДС рассчитывается от цены отгрузки, для остальных документов используется только первая колонка.\n");
+            JOptionPane.showMessageDialog(window,instruct);
                 });
+        opisanie.addActionListener(e -> {
+            JOptionPane.showMessageDialog(window,descriptionSchemas);
+        });
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
@@ -242,6 +265,12 @@ public class GeneratorGUI {
                     ExcelReader reader = new ExcelReader();
                     reader.read(srcFile.getText());
                     outputField.setText(String.valueOf(new Generate431xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
+                }
+                case 417 -> {
+                    JOptionPane.showMessageDialog(window, "Выбрана схема документа 417");
+                    ExcelReader reader = new ExcelReader();
+                    reader.read(srcFile.getText());
+                    outputField.setText(String.valueOf(new Generate417xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
                 }
                 default -> JOptionPane.showMessageDialog(window, "Выбрана неизвестная схема документа");
             }
@@ -314,6 +343,10 @@ public class GeneratorGUI {
         docNumLabel.setText("Реквизиты документа перемещения: номер документа");
         docDateLabel.setText("Реквизиты документа перемещения: дата документа");
         window.setTitle("Перемещение");
+    }
+    private void schema417LabelsNaming() {
+        schema431LabelsNaming();
+        window.setTitle("Возврат приостановленных лекарственных препаратов");
     }
     private void schema701LabelsNaming() {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
@@ -404,6 +437,7 @@ public class GeneratorGUI {
         xml251 = new JButton("251");
         xml431 = new JButton("431");
         xml702 = new JButton("702");
+        xml417 = new JButton("417");
         dateOperateNow = new JButton("Сейчас");
         docDateNow = new JButton("Сегодня");
         gosDateNow = new JButton("Сегодня");
@@ -412,6 +446,7 @@ public class GeneratorGUI {
         xml251.setBackground(Color.WHITE);
         xml431.setBackground(Color.WHITE);
         xml702.setBackground(Color.WHITE);
+        xml417.setBackground(Color.WHITE);
         confirm.setBackground(Color.GREEN);
         clipboard.setBackground(Color.MAGENTA);
         reset.setBackground(Color.RED);
@@ -479,8 +514,13 @@ public class GeneratorGUI {
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
+    private void optionFields417() {
+        outFileLAbel.setForeground(Color.GRAY);
+        outFileLAbel.setToolTipText("Не обязательное поле");
+    }
     private void bleachingButtons() {
         xml415.setBackground(Color.white);
+        xml417.setBackground(Color.white);
         xml701.setBackground(Color.white);
         xml251.setBackground(Color.white);
         xml431.setBackground(Color.white);
@@ -523,6 +563,7 @@ public class GeneratorGUI {
             case 415 -> optionFields415();
             case 431 -> optionFields431();
             case 702 -> optionFields702();
+            case 417 -> optionFields417();
             default -> defaultLabelsColor();
         }
         repaint();
