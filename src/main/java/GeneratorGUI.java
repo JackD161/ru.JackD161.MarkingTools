@@ -9,22 +9,29 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class GeneratorGUI {
-    private final String version = "1.2 alpha\n" +
-            "Разработчик: Холопкин Юрий (JackD161)\n" +
-            "e-mail: holopkin_yurik@mail.ru";
-    private final String instruct = "Инструменты для работы с маркировкой ЛС\n" +
-            "\n" +
-            "Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.\n" +
-            "Генератор работает с Excell файлами, из которых читает данные. Файл должен содержать информацию по колонкам:\n" +
-            "SGTIN | Цена отгрузки включая налог | НДС 10%/20%\n" +
-            "Цена отгрузки и НДС используются только для формирования 415 и 702 документов,\n" +
-            "величина НДС рассчитывается от цены отгрузки, для остальных документов используется только первая колонка.\n";
-    private final String descriptionSchemas = "251 - Отзыв части товара отправителем\n" +
-            "415 - Отгрузка ЛП со склада\n" +
-            "417 - Возврат приостановленных лекарственных препаратов\n" +
-            "431 - Перемещение\n" +
-            "701 - Подтверждение отгрузки / приемки\n" +
-            "702 - Оприходование\n";
+    private final String version = """
+            1.2 alpha
+            Разработчик: Холопкин Юрий (JackD161)
+            e-mail: holopkin_yurik@mail.ru
+            tel: +7-951-827-85-67
+            """;
+    private final String specification = """
+            Инструменты для работы с маркировкой ЛС
+
+            Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.
+            Генератор работает с Excell файлами, из которых читает данные. Файл должен содержать информацию по колонкам:
+            SGTIN | Цена отгрузки включая налог | НДС 10%/20%
+            Цена отгрузки и НДС используются только для формирования 415 и 702 документов,
+            величина НДС рассчитывается от цены отгрузки, для остальных документов используется только первая колонка.
+            """;
+    private final String descriptionSchemas = """
+            251 - Отзыв части товара отправителем
+            415 - Отгрузка ЛП со склада
+            417 - Возврат приостановленных ЛП
+            431 - Перемещение
+            701 - Подтверждение отгрузки / приемки
+            702 - Оприходование
+            """;
     private JFrame window;
     private JLabel srcFileLabel;
     private JTextField srcFile;
@@ -136,7 +143,6 @@ public class GeneratorGUI {
         xml415.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 415;
-            bleachingButtons();
             xml415.setBackground(Color.ORANGE);
             schema415LabelsNaming();
             generateForm(schema415);
@@ -144,7 +150,6 @@ public class GeneratorGUI {
         xml701.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 701;
-            bleachingButtons();
             xml701.setBackground(Color.ORANGE);
             schema701LabelsNaming();
             generateForm(schema701);
@@ -152,7 +157,6 @@ public class GeneratorGUI {
         xml251.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 251;
-            bleachingButtons();
             xml251.setBackground(Color.ORANGE);
             schema251LabelsNaming();
             generateForm(schema251);
@@ -160,7 +164,6 @@ public class GeneratorGUI {
         xml431.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 431;
-            bleachingButtons();
             xml431.setBackground(Color.ORANGE);
             schema431LabelsNaming();
             generateForm(schema431);
@@ -168,7 +171,6 @@ public class GeneratorGUI {
         xml417.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 417;
-            bleachingButtons();
             xml417.setBackground(Color.ORANGE);
             schema417LabelsNaming();
             generateForm(schema417);
@@ -176,7 +178,6 @@ public class GeneratorGUI {
         xml702.addActionListener(e -> {
             reset.doClick();
             xmlNumber = 702;
-            bleachingButtons();
             xml702.setBackground(Color.ORANGE);
             schema702LabelsNaming();
             generateForm(schema702);
@@ -205,12 +206,8 @@ public class GeneratorGUI {
             gosDate.setText(time.format(formatter));
         });
         aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window,"Версия генератора МДЛП документов " + version));
-        instruction.addActionListener(e -> {
-            JOptionPane.showMessageDialog(window,instruct);
-                });
-        opisanie.addActionListener(e -> {
-            JOptionPane.showMessageDialog(window,descriptionSchemas);
-        });
+        instruction.addActionListener(e -> JOptionPane.showMessageDialog(window, specification));
+        opisanie.addActionListener(e -> JOptionPane.showMessageDialog(window,descriptionSchemas));
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
