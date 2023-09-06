@@ -29,6 +29,7 @@ public class GeneratorGUI {
             415 - Отгрузка ЛП со склада
             417 - Возврат приостановленных ЛП
             431 - Перемещение
+            552 - Вывод из оборота
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
             """;
@@ -54,6 +55,7 @@ public class GeneratorGUI {
     private JButton xml431;
     private JButton xml702;
     private JButton xml417;
+    private JButton xml552;
     private JButton dateOperateNow;
     private JButton docDateNow;
     private JButton gosDateNow;
@@ -72,6 +74,8 @@ public class GeneratorGUI {
     private final JPanel center;
     private JLabel reasonRecallLabel;
     private JTextField reasonRecall;
+    private JLabel countryCodeLabel;
+    private JTextField countryCode;
     private HashMap<String, JTextField> fieldsMap;
     private HashMap<String, JLabel> labelsMap;
     private JLabel contractTypeLabel;
@@ -80,17 +84,22 @@ public class GeneratorGUI {
     private JComboBox<FinanceTypeEnum> financeTypeBox;
     private JLabel turnoverTypeLabel;
     private JComboBox<TurnoverTypeEnum> turnoverTypeBox;
+    private JLabel typeWithdrawalLabel;
+    private JComboBox<TypeWithdrawalEnum> typeWithdrawalBox;
+    private JLabel postingTypeLabel;
+    private JComboBox<PostingTypeEnum> postingTypeBox;
     private final String[] schema251 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "reasonRecall"};
     private final String[] schema701 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate"};
     private final String[] schema431 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
     private final String[] schema415 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate"};
     private final String[] schema702 = {"srcFile", "outFile", "senderMD", "inn", "kpp", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate"};
     private final String[] schema417 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
+    private final String[] schema552 = {"srcFile", "outFile", "senderMD", "dateOperate", "docNum", "docDate", "countryCode"};
     private ZonedDateTime time;
 
     public GeneratorGUI() {
         initFrame();
-        window.setBounds(300, 100, 900, 800);
+        window.setBounds(300, 100, 930, 800);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(outputField);
@@ -102,12 +111,12 @@ public class GeneratorGUI {
         JMenuItem exit = new JMenuItem("Выход");
         JMenuItem aboutIt = new JMenuItem("О программе");
         JMenuItem instruction = new JMenuItem("Описание работы");
-        JMenuItem opisanie = new JMenuItem("Описание схем документов");
+        JMenuItem definition = new JMenuItem("Описание схем документов");
         file.add(saveAs);
         file.add(exit);
         help.add(aboutIt);
         help.add(instruction);
-        help.add(opisanie);
+        help.add(definition);
         bar.add(file);
         bar.add(help);
 
@@ -120,6 +129,7 @@ public class GeneratorGUI {
         left.add(xml415);
         left.add(xml417);
         left.add(xml431);
+        left.add(xml552);
         left.add(xml701);
         left.add(xml702);
 
@@ -146,6 +156,13 @@ public class GeneratorGUI {
             xml415.setBackground(Color.ORANGE);
             schema415LabelsNaming();
             generateForm(schema415);
+        });
+        xml552.addActionListener(e -> {
+            reset.doClick();
+            xmlNumber = 552;
+            xml552.setBackground(Color.ORANGE);
+            schema552LabelsNaming();
+            generateForm(schema552);
         });
         xml701.addActionListener(e -> {
             reset.doClick();
@@ -207,7 +224,7 @@ public class GeneratorGUI {
         });
         aboutIt.addActionListener(e -> JOptionPane.showMessageDialog(window,"Версия генератора МДЛП документов " + version));
         instruction.addActionListener(e -> JOptionPane.showMessageDialog(window, specification));
-        opisanie.addActionListener(e -> JOptionPane.showMessageDialog(window,descriptionSchemas));
+        definition.addActionListener(e -> JOptionPane.showMessageDialog(window,descriptionSchemas));
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
@@ -227,6 +244,13 @@ public class GeneratorGUI {
         confirm.addActionListener(e -> {
             switch (xmlNumber) {
                 case 0 -> JOptionPane.showMessageDialog(window, "Не выбрана схема документа");
+                case 552 -> {
+                    JOptionPane.showMessageDialog(window, "Выбрана схема документа 552");
+                    ExcelReader reader = new ExcelReader();
+                    reader.read(srcFile.getText());
+                    String typeWithdrawal = (String.valueOf(((TypeWithdrawalEnum) Objects.requireNonNull(typeWithdrawalBox.getSelectedItem())).getVariable()));
+                    outputField.setText(String.valueOf(new Generate552xml(senderMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(),typeWithdrawal, countryCode.getText(), reader.getData()).getXML()));
+                }
                 case 415 -> {
                     JOptionPane.showMessageDialog(window, "Выбрана схема документа 415");
                     ExcelReader reader = new ExcelReader();
@@ -242,8 +266,8 @@ public class GeneratorGUI {
                     reader.read(srcFile.getText());
                     String contractTypeTeg = (String.valueOf(((ContractTypeEnum) Objects.requireNonNull(contractTypeBox.getSelectedItem())).getVariable()));
                     String financeTypeTeg = (String.valueOf(((FinanceTypeEnum) Objects.requireNonNull(financeTypeBox.getSelectedItem())).getVariable()));
-                    String turnoverTypeTeg = (String.valueOf(((TurnoverTypeEnum) Objects.requireNonNull(turnoverTypeBox.getSelectedItem())).getVariable()));
-                    outputField.setText(String.valueOf(new Generate702xml(senderMD.getText(), receiverMD.getText(),inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, turnoverTypeTeg, reader.getData()).getXML()));
+                    String postingTypeTeg = (String.valueOf(((PostingTypeEnum) Objects.requireNonNull(postingTypeBox.getSelectedItem())).getVariable()));
+                    outputField.setText(String.valueOf(new Generate702xml(senderMD.getText(), receiverMD.getText(),inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, postingTypeTeg, reader.getData()).getXML()));
                 }
                 case 701 -> {
                     JOptionPane.showMessageDialog(window, "Выбрана схема документа 701");
@@ -286,8 +310,11 @@ public class GeneratorGUI {
         contractTypeLabel.setText("");
         financeTypeLabel.setText("");
         turnoverTypeLabel.setText("");
+        typeWithdrawalLabel.setText("");
         innLabel.setText("");
         kppLabel.setText("");
+        countryCode.setText("");
+        postingTypeLabel.setText("");
         window.setTitle("Генератор МДЛП документа");
     }
     private void schema415LabelsNaming() {
@@ -319,7 +346,7 @@ public class GeneratorGUI {
         docDateLabel.setText("Реквизиты документа основания: дата документа");
         contractTypeLabel.setText("Тип договора");
         financeTypeLabel.setText("Источник финансирования");
-        turnoverTypeLabel.setText("Тип операции оприходования");
+        postingTypeLabel.setText("Тип операции оприходования");
         window.setTitle("Оприходование");
     }
     private void schema251LabelsNaming() {
@@ -331,14 +358,26 @@ public class GeneratorGUI {
         reasonRecallLabel.setText("Причина отзыва");
         window.setTitle("Отзыв части товара отправителем");
     }
+    private void schema552LabelsNaming() {
+        srcFileLabel.setText("Файл Excell cо списком SGTIN");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        dateOperateLabel.setText("Дата совершения операции");
+        docNumLabel.setText("Реквизиты документа основания: номер документа");
+        docDateLabel.setText("Реквизиты документа основания: дата документа");
+        typeWithdrawalLabel.setText("Тип вывода из оборота");
+        countryCodeLabel.setText("Код страны экспорта");
+        window.setTitle("Вывод из оборота");
+    }
     private void schema431LabelsNaming() {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
         receiverMDLabel.setText("Идентификатор организации-получателя");
         dateOperateLabel.setText("Дата совершения операции");
-        docNumLabel.setText("Реквизиты документа перемещения: номер документа");
-        docDateLabel.setText("Реквизиты документа перемещения: дата документа");
+        docNumLabel.setText("Регистрационный номер документа");
+        docDateLabel.setText("Дата регистрации документа");
+        typeWithdrawalLabel.setText("Тип вывода из оборота");
         window.setTitle("Перемещение");
     }
     private void schema417LabelsNaming() {
@@ -369,6 +408,9 @@ public class GeneratorGUI {
         turnoverTypeLabel = new JLabel();
         innLabel = new JLabel();
         kppLabel = new JLabel();
+        typeWithdrawalLabel = new JLabel();
+        countryCodeLabel = new JLabel();
+        postingTypeLabel = new JLabel();
         labelsMap.put("srcFile", srcFileLabel);
         labelsMap.put("outFile", outFileLAbel);
         labelsMap.put("senderMD", senderMDLabel);
@@ -384,6 +426,9 @@ public class GeneratorGUI {
         labelsMap.put("contractType", contractTypeLabel);
         labelsMap.put("inn", innLabel);
         labelsMap.put("kpp", kppLabel);
+        labelsMap.put("countryCode", countryCodeLabel);
+        labelsMap.put("typeWithdrawal", typeWithdrawalLabel);
+        labelsMap.put("postingType", postingTypeLabel);
     }
     private void initTextFields() {
         srcFile = new JTextField(30);
@@ -399,6 +444,7 @@ public class GeneratorGUI {
         reasonRecall = new JTextField(30);
         inn = new JTextField(30);
         kpp = new JTextField(30);
+        countryCode = new JTextField(30);
         docDate.setToolTipText("ДД.ММ.ГГГГ");
         gosDate.setToolTipText("ДД.ММ.ГГГГ");
         fieldsMap.put("srcFile", srcFile);
@@ -413,17 +459,32 @@ public class GeneratorGUI {
         fieldsMap.put("reasonRecall", reasonRecall);
         fieldsMap.put("inn", inn);
         fieldsMap.put("kpp", kpp);
+        fieldsMap.put("countryCode", countryCode);
     }
-    private void initComboBox() {
-        contractTypeBox = new JComboBox<>(ContractTypeEnum.values());
-        financeTypeBox = new JComboBox<>(FinanceTypeEnum.values());
-        turnoverTypeBox = new JComboBox<>(TurnoverTypeEnum.values());
-        center.add(labelsMap.get("contractType"));
-        center.add(contractTypeBox);
-        center.add(labelsMap.get("financeType"));
-        center.add(financeTypeBox);
-        center.add(labelsMap.get("turnoverType"));
-        center.add(turnoverTypeBox);
+    private void initComboBox(int schema) {
+            contractTypeBox = new JComboBox<>(ContractTypeEnum.values());
+            financeTypeBox = new JComboBox<>(FinanceTypeEnum.values());
+            turnoverTypeBox = new JComboBox<>(TurnoverTypeEnum.values());
+            typeWithdrawalBox = new JComboBox<>(TypeWithdrawalEnum.values());
+            postingTypeBox = new JComboBox<>(PostingTypeEnum.values());
+            if (schema == 415 || schema == 702) {
+                center.add(labelsMap.get("contractType"));
+                center.add(contractTypeBox);
+                center.add(labelsMap.get("financeType"));
+                center.add(financeTypeBox);
+                if (schema == 415) {
+                    center.add(labelsMap.get("turnoverType"));
+                    center.add(turnoverTypeBox);
+                }
+                else {
+                    center.add(labelsMap.get("postingType"));
+                    center.add(postingTypeBox);
+                }
+            }
+            else if (schema == 552) {
+                center.add(labelsMap.get("typeWithdrawal"));
+                center.add(typeWithdrawalBox);
+            }
     }
     private void initButtons() {
         reset = new JButton("Сброс");
@@ -435,6 +496,7 @@ public class GeneratorGUI {
         xml431 = new JButton("431");
         xml702 = new JButton("702");
         xml417 = new JButton("417");
+        xml552 = new JButton("552");
         dateOperateNow = new JButton("Сейчас");
         docDateNow = new JButton("Сегодня");
         gosDateNow = new JButton("Сегодня");
@@ -444,6 +506,7 @@ public class GeneratorGUI {
         xml431.setBackground(Color.WHITE);
         xml702.setBackground(Color.WHITE);
         xml417.setBackground(Color.WHITE);
+        xml552.setBackground(Color.WHITE);
         confirm.setBackground(Color.GREEN);
         clipboard.setBackground(Color.MAGENTA);
         reset.setBackground(Color.RED);
@@ -460,6 +523,7 @@ public class GeneratorGUI {
         docDate.setBackground(Color.WHITE);
         inn.setBackground(Color.WHITE);
         kpp.setBackground(Color.WHITE);
+        countryCode.setBackground(Color.WHITE);
     }
     private void defaultLabelsColor() {
         srcFileLabel.setForeground(Color.BLACK);
@@ -477,6 +541,9 @@ public class GeneratorGUI {
         turnoverTypeLabel.setForeground(Color.BLACK);
         innLabel.setForeground(Color.BLACK);
         kppLabel.setForeground(Color.BLACK);
+        countryCodeLabel.setForeground(Color.BLACK);
+        typeWithdrawalLabel.setForeground(Color.BLACK);
+        postingTypeLabel.setForeground(Color.BLACK);
     }
     private void optionFields251() {
         outFileLAbel.setForeground(Color.GRAY);
@@ -485,6 +552,12 @@ public class GeneratorGUI {
     private void optionFields701() {
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
+    }
+    private void optionFields552() {
+        outFileLAbel.setForeground(Color.GRAY);
+        outFileLAbel.setToolTipText("Не обязательное поле");
+        countryCodeLabel.setForeground(Color.GRAY);
+        countryCodeLabel.setToolTipText("Не обязательное поле, формат A-Z 2 символа (RU)");
     }
     private void optionFields415() {
         outFileLAbel.setForeground(Color.GRAY);
@@ -505,7 +578,6 @@ public class GeneratorGUI {
         kppLabel.setToolTipText("Не обязательное поле");
         receiverMDLabel.setForeground(Color.GRAY);
         receiverMDLabel.setToolTipText("Не обязательное поле");
-
     }
     private void optionFields431() {
         outFileLAbel.setForeground(Color.GRAY);
@@ -522,6 +594,7 @@ public class GeneratorGUI {
         xml251.setBackground(Color.white);
         xml431.setBackground(Color.white);
         xml702.setBackground(Color.white);
+        xml552.setBackground(Color.white);
     }
     private void clearFields() {
         srcFile.setText("");
@@ -537,6 +610,7 @@ public class GeneratorGUI {
         reasonRecall.setText("");
         inn.setText("");
         kpp.setText("");
+        countryCode.setText("");
     }
     private void generateForm(String[] list) {
         for (String field : list) {
@@ -552,8 +626,8 @@ public class GeneratorGUI {
                 center.add(gosDateNow);
             }
         }
-        if (xmlNumber == 415 || xmlNumber == 702)
-            initComboBox();
+        if (xmlNumber == 415 || xmlNumber == 702 || xmlNumber == 552)
+            initComboBox(xmlNumber);
         switch (xmlNumber) {
             case 251 -> optionFields251();
             case 701 -> optionFields701();
@@ -561,6 +635,7 @@ public class GeneratorGUI {
             case 431 -> optionFields431();
             case 702 -> optionFields702();
             case 417 -> optionFields417();
+            case 552 -> optionFields552();
             default -> defaultLabelsColor();
         }
         repaint();
