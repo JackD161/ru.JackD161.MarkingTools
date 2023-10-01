@@ -18,7 +18,7 @@ public class ExcelReader {
 В одном файле (книге) Excel имеется несколько страниц (листов). Эти листы мы обходим с помощью итератора,
 который возвращает метод sheetIterator(). Обработка каждого листа происходит в методе processSheet().
  */
-    public void read(String filename) {
+    public void read(String filename) throws ExceptiionReadExcellFile {
         try (Workbook workbook = loadWorkbook(filename)) {
             assert workbook != null;
             var sheetIterator = workbook.sheetIterator();
@@ -28,7 +28,7 @@ public class ExcelReader {
             }
         }
         catch (IOException exception) {
-            System.err.println("Ощибка чтения файла с SGTIN");
+            throw new ExceptiionReadExcellFile();
         }
     }
 /*
