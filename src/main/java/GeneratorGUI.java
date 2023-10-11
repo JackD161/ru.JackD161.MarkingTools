@@ -52,6 +52,7 @@ public class GeneratorGUI {
     private JLabel kppLabel;
     private JTextField kpp;
     private JTextArea outputField;
+    private JTextArea logField;
     private JButton xml415;
     private JButton xml701;
     private JButton xml251;
@@ -106,7 +107,8 @@ public class GeneratorGUI {
         window.setBounds(300, 100, 930, 800);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(outputField);
+        JScrollPane scrollOutPane = new JScrollPane(outputField);
+        JScrollPane scrollLogPane = new JScrollPane(logField);
 
         JMenuBar bar = new JMenuBar();
         JMenu file = new JMenu("Файл");
@@ -129,6 +131,9 @@ public class GeneratorGUI {
         JPanel right = new JPanel();
         JPanel left = new JPanel();
 
+        left.setLayout(new BoxLayout(left, BoxLayout.PAGE_AXIS));
+        right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
+
         left.add(xml251);
         left.add(xml415);
         left.add(xml417);
@@ -137,14 +142,15 @@ public class GeneratorGUI {
         left.add(xml701);
         left.add(xml702);
 
-        right.add(scrollPane);
+        right.add(new JLabel("Вывод"));
+        right.add(scrollOutPane);
+        right.add(new JLabel("Log"));
+        right.add(scrollLogPane);
 
         footer.add(confirm);
         footer.add(reset);
         footer.add(clipboard);
         footer.setLayout(new FlowLayout());
-
-        left.setLayout(new BoxLayout(left, BoxLayout.PAGE_AXIS));
 
         window.getContentPane().add(BorderLayout.PAGE_START, bar);
         window.getContentPane().add(BorderLayout.PAGE_END, footer);
@@ -234,6 +240,7 @@ public class GeneratorGUI {
             if (!outFile.getText().isBlank()) {
                 new SaveXMLfile(outFile.getText(), "Document" + xmlNumber + ".xml", outputField.getText());
                 JOptionPane.showMessageDialog(window, "Файл сохранен");
+                logField.append("Файл сохранен");
             }
             else {
                 JOptionPane.showMessageDialog(window, "Не задан путь сохранения файла");
@@ -489,7 +496,8 @@ public class GeneratorGUI {
         senderMD = new JTextField(30);
         receiverMD = new JTextField(30);
         dateOperate = new JTextField(23);
-        outputField = new JTextArea(40, 40);
+        outputField = new JTextArea(35, 40);
+        logField = new JTextArea(5, 40);
         gosNum = new JTextField(30);
         gosDate = new JTextField(22);
         docNum = new JTextField(30);
@@ -654,6 +662,7 @@ public class GeneratorGUI {
         docNum.setText("");
         docDate.setText("");
         outputField.setText("");
+        logField.setText("");
         reasonRecall.setText("");
         inn.setText("");
         kpp.setText("");
