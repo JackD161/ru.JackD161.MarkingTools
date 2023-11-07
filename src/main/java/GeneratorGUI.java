@@ -33,6 +33,14 @@ public class GeneratorGUI {
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
             """;
+    private final String errorEqMD = """
+            Места деятельности отправителя и получателя
+            принадлежат одному юридическому лицу.
+            Это недопустимо для выбранной схемы документа""";
+    private final String errorNotEqMD = """
+            Места деятельности отправителя и получателя
+            не принадлежат одному юридическому лицу.
+            Это недопустимо для выбранной схемы документа""";
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";
     private final String selectedSchema = "Выбрана схема документа ";
@@ -43,8 +51,10 @@ public class GeneratorGUI {
     private JTextField outFile;
     private JLabel senderMDLabel;
     private JTextField senderMD;
+    private JComboBox<AddressesMDEnum> senderMDBox;
     private JLabel receiverMDLabel;
     private JTextField receiverMD;
+    private JComboBox<AddressesMDEnum> receiverMDBox;
     private JLabel dateOperateLabel;
     private JTextField dateOperate;
     private JLabel innLabel;
@@ -93,18 +103,17 @@ public class GeneratorGUI {
     private JComboBox<TypeWithdrawalEnum> typeWithdrawalBox;
     private JLabel postingTypeLabelBox;
     private JComboBox<PostingTypeEnum> postingTypeBox;
-    private final String[] schema251 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "reasonRecall"};
-    private final String[] schema701 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate"};
-    private final String[] schema431 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
-    private final String[] schema415 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "turnoverTypeBox"};
-    private final String[] schema702 = {"srcFile", "outFile", "senderMD", "inn", "kpp", "receiverMD", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "postingTypeBox"};
-    private final String[] schema417 = {"srcFile", "outFile", "senderMD", "receiverMD", "dateOperate", "docNum", "docDate"};
-    private final String[] schema552 = {"srcFile", "outFile", "senderMD", "dateOperate", "docNum", "docDate", "countryCode", "typeWithdrawalBox"};
+    private final String[] schema251 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "reasonRecall"};
+    private final String[] schema701 = {"srcFile", "outFile", "sender", "receiver", "dateOperate"};
+    private final String[] schema431 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
+    private final String[] schema415 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "turnoverTypeBox"};
+    private final String[] schema702 = {"srcFile", "outFile", "sender", "receiver", "inn", "kpp", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "postingTypeBox"};
+    private final String[] schema417 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
+    private final String[] schema552 = {"srcFile", "outFile", "sender", "dateOperate", "docNum", "docDate", "countryCode", "typeWithdrawalBox"};
     private ZonedDateTime time;
-
     public GeneratorGUI() {
         initFrame();
-        window.setBounds(300, 100, 930, 800);
+        window.setBounds(300, 100, 930, 820);
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         window.setLayout(new BorderLayout());
         JScrollPane scrollOutPane = new JScrollPane(outputField);
@@ -222,6 +231,7 @@ public class GeneratorGUI {
             bleachingFields();
             bleachingButtons();
             defaultLabelsColor();
+            setDefaultComboBoxValues();
             center.removeAll();
             xmlNumber = 0;
             log("Сброс полей формы");
@@ -262,18 +272,37 @@ public class GeneratorGUI {
             systemClipboard.setContents(stringSelection, null);
         });
         confirm.addActionListener(e -> {
+            boolean dictMDsenser = false;
+            boolean dictMDreceiver = false;
+            String sender = senderMD.getText();
+            if (sender.isBlank()) {
+                dictMDsenser = true;
+                sender = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(senderMDBox.getSelectedItem())).getMd()));
+            }
+            String receiver = receiverMD.getText();
+            if (receiver.isBlank()) {
+                dictMDreceiver = true;
+                receiver = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(receiverMDBox.getSelectedItem())).getMd()));
+            }
+            String contractTypeTeg = (String.valueOf(((ContractTypeEnum) Objects.requireNonNull(contractTypeBox.getSelectedItem())).getVariable()));
+            String financeTypeTeg = (String.valueOf(((FinanceTypeEnum) Objects.requireNonNull(financeTypeBox.getSelectedItem())).getVariable()));
+            String turnoverTypeTeg = (String.valueOf(((TurnoverTypeEnum) Objects.requireNonNull(turnoverTypeBox.getSelectedItem())).getVariable()));
+            String postingTypeTeg = (String.valueOf(((PostingTypeEnum) Objects.requireNonNull(postingTypeBox.getSelectedItem())).getVariable()));
+            String receiverOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(receiverMDBox.getSelectedItem())).getOrg()));
+            String senderOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(senderMDBox.getSelectedItem())).getOrg()));
+            ExcelReader reader = new ExcelReader();
             switch (xmlNumber) {
-                case 0 -> JOptionPane.showMessageDialog(window, "Не выбрана схема документа", "Ошибка", JOptionPane.WARNING_MESSAGE);
+                case 0 -> JOptionPane.showMessageDialog(window, "Не выбрана схема документа", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 case 552 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
                             String typeWithdrawal = (String.valueOf(((TypeWithdrawalEnum) Objects.requireNonNull(typeWithdrawalBox.getSelectedItem())).getVariable()));
-                            outputField.setText(String.valueOf(new Generate552xml(senderMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), typeWithdrawal, countryCode.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate552xml(sender, dateOperate.getText(), docNum.getText(), docDate.getText(), typeWithdrawal, countryCode.getText(), reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
                     }
@@ -281,33 +310,41 @@ public class GeneratorGUI {
                 }
                 case 415 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
-                        try {
-                            reader.read(srcFile.getText());
-                            log(selectedSchema + xmlNumber);
-                            String contractTypeTeg = (String.valueOf(((ContractTypeEnum) Objects.requireNonNull(contractTypeBox.getSelectedItem())).getVariable()));
-                            String financeTypeTeg = (String.valueOf(((FinanceTypeEnum) Objects.requireNonNull(financeTypeBox.getSelectedItem())).getVariable()));
-                            String turnoverTypeTeg = (String.valueOf(((TurnoverTypeEnum) Objects.requireNonNull(turnoverTypeBox.getSelectedItem())).getVariable()));
-                            outputField.setText(String.valueOf(new Generate415xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, turnoverTypeTeg, reader.getData()).getXML()));
-                        } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
-                            log(errReadExcellFile);
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD);
+                                break;
+                            }
                         }
+                            try {
+                                reader.clear();
+                                reader.read(srcFile.getText());
+                                log(selectedSchema + xmlNumber);
+                                outputField.setText(String.valueOf(new Generate415xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, turnoverTypeTeg, reader.getData()).getXML()));
+                            } catch (ExceptiionReadExcellFile exception) {
+                                JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errReadExcellFile);
+                            }
                     }
                     else log(errRqFields);
                 }
                 case 702 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD);
+                                break;
+                            }
+                        }
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            String contractTypeTeg = (String.valueOf(((ContractTypeEnum) Objects.requireNonNull(contractTypeBox.getSelectedItem())).getVariable()));
-                            String financeTypeTeg = (String.valueOf(((FinanceTypeEnum) Objects.requireNonNull(financeTypeBox.getSelectedItem())).getVariable()));
-                            String postingTypeTeg = (String.valueOf(((PostingTypeEnum) Objects.requireNonNull(postingTypeBox.getSelectedItem())).getVariable()));
-                            outputField.setText(String.valueOf(new Generate702xml(senderMD.getText(), receiverMD.getText(), inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, postingTypeTeg, reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate702xml(sender, receiver, inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, postingTypeTeg, reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
                     }
@@ -315,13 +352,20 @@ public class GeneratorGUI {
                 }
                 case 701 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD);
+                                break;
+                            }
+                        }
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate701xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate701xml(sender, receiver, dateOperate.getText(), reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
                     }
@@ -329,13 +373,20 @@ public class GeneratorGUI {
                 }
                 case 251 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD);
+                                break;
+                            }
+                        }
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate251xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), reasonRecall.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate251xml(sender, receiver, dateOperate.getText(), reasonRecall.getText(), reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
                     }
@@ -343,13 +394,20 @@ public class GeneratorGUI {
                 }
                 case 431 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (!senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorNotEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorNotEqMD);
+                                break;
+                            }
+                        }
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate431xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate431xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
                     }
@@ -357,10 +415,17 @@ public class GeneratorGUI {
             }
                 case 417 -> {
                     if (checkRequiredField(xmlNumber)) {
-                        ExcelReader reader = new ExcelReader();
+                        if (dictMDreceiver && dictMDsenser) {
+                            if (senderOrg.equals(receiverOrg)) {
+                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD);
+                                break;
+                            }
+                        }
                         try {
+                            reader.clear();
                             reader.read(srcFile.getText());
-                            outputField.setText(String.valueOf(new Generate417xml(senderMD.getText(), receiverMD.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate417xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile);
                             log(errReadExcellFile);
@@ -463,11 +528,12 @@ public class GeneratorGUI {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
-        receiverMDLabel.setText("Идентификатор контрагента");
+        receiverMDLabel.setText("Идентификатор организации-получателя");
         dateOperateLabel.setText("Дата совершения операции");
         window.setTitle("Подтверждение отгрузки / приемки");
     }
     private void initLabels() {
+        labelsMap = new HashMap<>();
         srcFileLabel = new JLabel();
         outFileLAbel = new JLabel();
         senderMDLabel = new JLabel();
@@ -488,8 +554,8 @@ public class GeneratorGUI {
         postingTypeLabelBox = new JLabel();
         labelsMap.put("srcFile", srcFileLabel);
         labelsMap.put("outFile", outFileLAbel);
-        labelsMap.put("senderMD", senderMDLabel);
-        labelsMap.put("receiverMD", receiverMDLabel);
+        labelsMap.put("sender", senderMDLabel);
+        labelsMap.put("receiver", receiverMDLabel);
         labelsMap.put("dateOperate", dateOperateLabel);
         labelsMap.put("gosNum", gosNumLabel);
         labelsMap.put("gosDate", gosDateLabel);
@@ -506,6 +572,7 @@ public class GeneratorGUI {
         labelsMap.put("postingTypeBox", postingTypeLabelBox);
     }
     private void initTextFields() {
+        fieldsMap = new HashMap<>();
         srcFile = new JTextField(30);
         outFile = new JTextField(30);
         senderMD = new JTextField(30);
@@ -525,8 +592,8 @@ public class GeneratorGUI {
         gosDate.setToolTipText("ДД.ММ.ГГГГ");
         fieldsMap.put("srcFile", srcFile);
         fieldsMap.put("outFile", outFile);
-        fieldsMap.put("senderMD", senderMD);
-        fieldsMap.put("receiverMD", receiverMD);
+        fieldsMap.put("sender", senderMD);
+        fieldsMap.put("receiver", receiverMD);
         fieldsMap.put("dateOperate", dateOperate);
         fieldsMap.put("gosNum", gosNum);
         fieldsMap.put("gosDate", gosDate);
@@ -539,16 +606,15 @@ public class GeneratorGUI {
     }
     private void initComboBox() {
         comboBoxMap = new HashMap<>();
+        senderMDBox = new JComboBox<>(AddressesMDEnum.values());
+        receiverMDBox = new JComboBox<>(AddressesMDEnum.values());
         contractTypeBox = new JComboBox<>(ContractTypeEnum.values());
         financeTypeBox = new JComboBox<>(FinanceTypeEnum.values());
         turnoverTypeBox = new JComboBox<>(TurnoverTypeEnum.values());
         typeWithdrawalBox = new JComboBox<>(TypeWithdrawalEnum.values());
         postingTypeBox = new JComboBox<>(PostingTypeEnum.values());
-        contractTypeBox.setSelectedItem(ContractTypeEnum.КУПЛЯ_ПРОДАЖА);
-        financeTypeBox.setSelectedItem(FinanceTypeEnum.СОБСТВЕННЫЕ_СРЕДСТВА);
-        turnoverTypeBox.setSelectedItem(TurnoverTypeEnum.ПРОДАЖА);
-        typeWithdrawalBox.setSelectedItem(TypeWithdrawalEnum.списание_без_уничтожения);
-        postingTypeBox.setSelectedItem(PostingTypeEnum.ПОСТУПЛЕНИЕ);
+        comboBoxMap.put("sender", senderMDBox);
+        comboBoxMap.put("receiver", receiverMDBox);
         comboBoxMap.put("contractTypeBox", contractTypeBox);
         comboBoxMap.put("financeTypeBox", financeTypeBox);
         comboBoxMap.put("turnoverTypeBox", turnoverTypeBox);
@@ -615,21 +681,46 @@ public class GeneratorGUI {
         typeWithdrawalLabelBox.setForeground(Color.BLACK);
         postingTypeLabelBox.setForeground(Color.BLACK);
     }
+    private void setDefaultComboBoxValues() {
+        senderMDBox.setSelectedItem(AddressesMDEnum.Склад_Фармация);
+        receiverMDBox.setSelectedItem(AddressesMDEnum.Склад_Фармация_Дона);
+        contractTypeBox.setSelectedItem(ContractTypeEnum.КУПЛЯ_ПРОДАЖА);
+        financeTypeBox.setSelectedItem(FinanceTypeEnum.СОБСТВЕННЫЕ_СРЕДСТВА);
+        turnoverTypeBox.setSelectedItem(TurnoverTypeEnum.ПРОДАЖА);
+        typeWithdrawalBox.setSelectedItem(TypeWithdrawalEnum.списание_без_уничтожения);
+        postingTypeBox.setSelectedItem(PostingTypeEnum.ПОСТУПЛЕНИЕ);
+    }
     private void optionFields251() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
     private void optionFields701() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
     private void optionFields552() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
         countryCodeLabel.setForeground(Color.GRAY);
         countryCodeLabel.setToolTipText("Не обязательное поле, формат A-Z 2 символа (RU)");
     }
     private void optionFields415() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
         gosDateLabel.setForeground(Color.GRAY);
@@ -638,6 +729,10 @@ public class GeneratorGUI {
         gosNumLabel.setToolTipText("Не обязательное поле");
     }
     private void optionFields702() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
         gosDateLabel.setForeground(Color.GRAY);
@@ -650,10 +745,18 @@ public class GeneratorGUI {
         receiverMDLabel.setToolTipText("Не обязательное поле");
     }
     private void optionFields431() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
     private void optionFields417() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        receiverMD.setForeground(Color.GRAY);
+        receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
@@ -693,10 +796,22 @@ public class GeneratorGUI {
         boolean innFlag = !inn.getText().isBlank();
         if (!srcFileFlag) srcFile.setBackground(Color.RED);
         else srcFile.setBackground(Color.WHITE);
-        if (!senderMdFlag) senderMD.setBackground(Color.RED);
-        else senderMD.setBackground(Color.WHITE);
-        if (!receiverMdFlag) receiverMD.setBackground(Color.RED);
-        else receiverMD.setBackground(Color.WHITE);
+        if (!senderMdFlag) {
+            senderMD.setBackground(Color.WHITE);
+            log("МД отправителя взят из справочника");
+        }
+        else {
+            senderMD.setBackground(Color.CYAN);
+            log("МД отправителя введен вручную");
+        }
+        if (!receiverMdFlag) {
+            receiverMD.setBackground(Color.WHITE);
+            log("МД получателя взят из справочника");
+        }
+        else {
+            receiverMD.setBackground(Color.CYAN);
+            log("МД получателя введен вручную");
+        }
         if (!dateOperateFlag) dateOperate.setBackground(Color.RED);
         else dateOperate.setBackground(Color.WHITE);
         if (!docNumFlag) docNum.setBackground(Color.RED);
@@ -708,18 +823,20 @@ public class GeneratorGUI {
         if (!innFlag) inn.setBackground(Color.RED);
         else inn.setBackground(Color.WHITE);
         return switch (schema) {
-            case 415, 431, 417 -> senderMdFlag && receiverMdFlag && srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
-            case 251 -> senderMdFlag && receiverMdFlag && srcFileFlag && dateOperateFlag && reasonRecallFlag;
-            case 552 -> senderMdFlag && srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
-            case 701 -> senderMdFlag && receiverMdFlag && srcFileFlag && dateOperateFlag;
-            case 702 -> senderMdFlag && srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag;
-
+            case 415, 431, 417, 552-> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
+            case 251 -> srcFileFlag && dateOperateFlag && reasonRecallFlag;
+            case 701 -> srcFileFlag && dateOperateFlag;
+            case 702 -> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag;
             default -> throw new IllegalStateException("Неизвестный тип схемы: " + schema);
         };
     }
     private void generateForm(String[] list) {
         for (String field : list) {
             center.add(labelsMap.get(field));
+            if (field.equals("sender") || field.equals("receiver")) {
+                center.add(comboBoxMap.get(field));
+                center.add(fieldsMap.get(field));
+            }
             if (field.endsWith("Box")) center.add(comboBoxMap.get(field));
             else center.add(fieldsMap.get(field));
             if (field.equals("dateOperate")) {
@@ -744,6 +861,11 @@ public class GeneratorGUI {
         }
         repaint();
     }
+    private boolean compareOrg (String org1, String org2, boolean anotherMD) {
+        if (anotherMD)
+            return true;
+        else return org1.equals(org2);
+    }
     private void repaint() {
         window.setVisible(true);
         window.repaint();
@@ -756,8 +878,6 @@ public class GeneratorGUI {
     private void initFrame() {
         window = new JFrame("Генератор МДЛП документа");
         time = ZonedDateTime.now(ZoneOffset.UTC);
-        fieldsMap = new HashMap<>();
-        labelsMap = new HashMap<>();
         initLabels();
         initTextFields();
         initButtons();

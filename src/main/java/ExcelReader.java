@@ -31,6 +31,9 @@ public class ExcelReader {
             throw new ExceptiionReadExcellFile();
         }
     }
+    public void clear() {
+        data.clear();
+    }
 /*
 Метод loadWorkbook() анализирует расширение файла и в зависимости от него определяет формат файла.
 Сначала мы создаём FileInputStream, связанный с исходным файлом, затем создаём на основе этого потока нужную реализацию
