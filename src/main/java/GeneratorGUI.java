@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class GeneratorGUI {
     private final String version = """
-            1.3 alpha
+            1.4 alpha
             Разработчик: Холопкин Юрий (JackD161)
             e-mail: holopkin_yurik@mail.ru
             tel: +7-951-827-85-67
