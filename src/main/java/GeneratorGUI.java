@@ -861,11 +861,6 @@ public class GeneratorGUI {
         }
         repaint();
     }
-    private boolean compareOrg (String org1, String org2, boolean anotherMD) {
-        if (anotherMD)
-            return true;
-        else return org1.equals(org2);
-    }
     private void repaint() {
         window.setVisible(true);
         window.repaint();
