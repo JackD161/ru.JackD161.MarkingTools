@@ -6,6 +6,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class GeneratorGUI {
@@ -33,14 +34,6 @@ public class GeneratorGUI {
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
             """;
-    private final String errorEqMD = """
-            Места деятельности отправителя и получателя
-            принадлежат одному юридическому лицу.
-            Это недопустимо для выбранной схемы документа""";
-    private final String errorNotEqMD = """
-            Места деятельности отправителя и получателя
-            не принадлежат одному юридическому лицу.
-            Это недопустимо для выбранной схемы документа""";
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";
     private final String selectedSchema = "Выбрана схема документа ";
@@ -312,8 +305,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(0), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(0));
                                 break;
                             }
                         }
@@ -333,8 +326,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(0), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(0));
                                 break;
                             }
                         }
@@ -354,8 +347,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(0), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(0));
                                 break;
                             }
                         }
@@ -375,8 +368,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(0), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(0));
                                 break;
                             }
                         }
@@ -396,8 +389,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (!senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorNotEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorNotEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(1), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(1));
                                 break;
                             }
                         }
@@ -417,8 +410,8 @@ public class GeneratorGUI {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
                             if (senderOrg.equals(receiverOrg)) {
-                                JOptionPane.showMessageDialog(window, errorEqMD, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                                log(errorEqMD);
+                                JOptionPane.showMessageDialog(window, errorEqMD(0), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(errorEqMD(0));
                                 break;
                             }
                         }
@@ -438,23 +431,9 @@ public class GeneratorGUI {
         });
     }
     private void clearLabelsNaming() {
-        srcFileLabel.setText("");
-        outFileLAbel.setText("");
-        senderMDLabel.setText("");
-        receiverMDLabel.setText("");
-        dateOperateLabel.setText("");
-        gosNumLabel.setText("");
-        gosDateLabel.setText("");
-        docNumLabel.setText("");
-        docDateLabel.setText("");
-        contractTypeLabelBox.setText("");
-        financeTypeLabelBox.setText("");
-        turnoverTypeLabelBox.setText("");
-        typeWithdrawalLabelBox.setText("");
-        innLabel.setText("");
-        kppLabel.setText("");
-        countryCode.setText("");
-        postingTypeLabelBox.setText("");
+        for (Map.Entry<String, JLabel> pair : labelsMap.entrySet()) {
+            pair.getValue().setText("");
+        }
         window.setTitle("Генератор МДЛП документа");
     }
     private void schema415LabelsNaming() {
@@ -647,39 +626,19 @@ public class GeneratorGUI {
         reset.setBackground(Color.RED);
     }
     private void bleachingFields() {
-        srcFile.setBackground(Color.WHITE);
-        outFile.setBackground(Color.WHITE);
-        senderMD.setBackground(Color.WHITE);
-        receiverMD.setBackground(Color.WHITE);
-        dateOperate.setBackground(Color.WHITE);
-        gosNum.setBackground(Color.WHITE);
-        gosDate.setBackground(Color.WHITE);
-        docNum.setBackground(Color.WHITE);
-        docDate.setBackground(Color.WHITE);
-        inn.setBackground(Color.WHITE);
-        kpp.setBackground(Color.WHITE);
-        countryCode.setBackground(Color.WHITE);
-        reasonRecall.setBackground(Color.WHITE);
+        for (Map.Entry<String, JTextField> pair : fieldsMap.entrySet()) {
+            pair.getValue().setBackground(Color.WHITE);
+        }
     }
     private void defaultLabelsColor() {
-        srcFileLabel.setForeground(Color.BLACK);
-        outFileLAbel.setForeground(Color.BLACK);
-        senderMDLabel.setForeground(Color.BLACK);
-        receiverMDLabel.setForeground(Color.BLACK);
-        dateOperateLabel.setForeground(Color.BLACK);
-        gosNumLabel.setForeground(Color.BLACK);
-        gosDateLabel.setForeground(Color.BLACK);
-        docNumLabel.setForeground(Color.BLACK);
-        docDateLabel.setForeground(Color.BLACK);
-        reasonRecallLabel.setForeground(Color.BLACK);
-        contractTypeLabelBox.setForeground(Color.BLACK);
-        financeTypeLabelBox.setForeground(Color.BLACK);
-        turnoverTypeLabelBox.setForeground(Color.BLACK);
-        innLabel.setForeground(Color.BLACK);
-        kppLabel.setForeground(Color.BLACK);
-        countryCodeLabel.setForeground(Color.BLACK);
-        typeWithdrawalLabelBox.setForeground(Color.BLACK);
-        postingTypeLabelBox.setForeground(Color.BLACK);
+        for (Map.Entry<String, JLabel> pair : labelsMap.entrySet()) {
+            pair.getValue().setForeground(Color.BLACK);
+        }
+    }
+    private void clearFields() {
+        for (Map.Entry<String, JTextField> pair : fieldsMap.entrySet()) {
+            pair.getValue().setText("");
+        }
     }
     private void setDefaultComboBoxValues() {
         senderMDBox.setSelectedItem(AddressesMDEnum.Склад_Фармация);
@@ -769,22 +728,6 @@ public class GeneratorGUI {
         xml702.setBackground(Color.white);
         xml552.setBackground(Color.white);
     }
-    private void clearFields() {
-        srcFile.setText("");
-        outFile.setText("");
-        senderMD.setText("");
-        receiverMD.setText("");
-        dateOperate.setText("");
-        gosNum.setText("");
-        gosDate.setText("");
-        docNum.setText("");
-        docDate.setText("");
-        outputField.setText("");
-        reasonRecall.setText("");
-        inn.setText("");
-        kpp.setText("");
-        countryCode.setText("");
-    }
     private boolean checkRequiredField(int schema) {
         boolean srcFileFlag = !srcFile.getText().isBlank();
         boolean senderMdFlag = !senderMD.getText().isBlank();
@@ -865,7 +808,12 @@ public class GeneratorGUI {
         window.setVisible(true);
         window.repaint();
     }
-
+    private String errorEqMD (int i) {
+        String not = "";
+        if (i == 1)
+            not = "не ";
+        return "Места деятельности отправителя и получателя\n" + not + "принадлежат одному юридическому лицу.\nЭто недопустимо для выбранной схемы документа";
+    }
     private void log(String message) {
         logField.append("\n" + message);
     }
