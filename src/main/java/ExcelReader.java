@@ -5,6 +5,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -86,7 +88,11 @@ public class ExcelReader {
             case STRING -> dataRow.add(cell.getStringCellValue());
             case NUMERIC -> {
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    dataRow.add(cell.getLocalDateTimeCellValue());
+//                    dataRow.add(cell.getLocalDateTimeCellValue());
+                    LocalDateTime dateTime = cell.getLocalDateTimeCellValue();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    String str = dateTime.format(formatter);
+                    dataRow.add(str);
                 }
                 else {
                     dataRow.add(NumberToTextConverter.toText(cell.getNumericCellValue()));
