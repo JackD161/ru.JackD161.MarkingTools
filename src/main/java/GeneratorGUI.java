@@ -33,7 +33,7 @@ public class GeneratorGUI {
             415 - Отгрузка ЛП со склада
             417 - Возврат приостановленных ЛП
             431 - Перемещение
-            512 - Списание с причиной «Отпуск по документу»
+            512 - Вывод из оборота с причиной «Отпуск по документу»
             552 - Вывод из оборота
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
@@ -538,7 +538,7 @@ public class GeneratorGUI {
         senderMDLabel.setText("Идентификатор организации-отправителя");
         dateOperateLabel.setText("Дата и время совершения операции");
         docDateLabel.setText("Дата регистрации документа отпуска");
-        window.setTitle("Списание с причиной «Отпуск по документу»");
+        window.setTitle("Вывод из оборота с причиной «Отпуск по документу»");
     }
     private void schema701LabelsNaming() {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
@@ -750,7 +750,8 @@ public class GeneratorGUI {
         receiverMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
-    }    private void optionFields512() {
+    }
+    private void optionFields512() {
         senderMD.setForeground(Color.GRAY);
         senderMD.setToolTipText("Не обязательное поле");
         outFileLAbel.setForeground(Color.GRAY);
@@ -847,6 +848,7 @@ public class GeneratorGUI {
             case 702 -> optionFields702();
             case 417 -> optionFields417();
             case 552 -> optionFields552();
+            case 512 -> optionFields512();
             default -> defaultLabelsColor();
         }
         repaint();
