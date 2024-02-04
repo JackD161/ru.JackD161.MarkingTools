@@ -6,17 +6,17 @@ public class PregnantCertificate {
     String prescription_num;
     String prescription_date;
     String prescription_series;
-    List<Goods> goods;
+    List<Goods> goodsList;
 
     public PregnantCertificate (String prescription_series, String prescription_num, String prescription_date) {
         this.name = prescription_series + prescription_num;
         this.prescription_series = prescription_series;
         this.prescription_num = prescription_num;
         this.prescription_date = prescription_date;
-        this.goods = new ArrayList<>();
+        this.goodsList = new ArrayList<>();
     }
     public void addGoods (Goods goods) {
-        this.goods.add(goods);
+        this.goodsList.add(goods);
     }
     public String getName() {
         return name;
@@ -34,7 +34,7 @@ public class PregnantCertificate {
         return prescription_series;
     }
 
-    public List<Goods> getGoods() {
-        return goods;
+    public List<Goods> getGoodsList() {
+        return goodsList;
     }
 }

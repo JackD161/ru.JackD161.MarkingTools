@@ -4,7 +4,7 @@ public class Goods {
     String cost;
     String vat_value;
 
-    public Goods (String name, String sgtin, String cost, String nds) {
+    public Goods (String sgtin, String cost, String nds, String name) {
         this.name = name;
         this.sgtin = sgtin;
         this.cost = cost;
@@ -16,7 +16,7 @@ public class Goods {
         this.cost = cost;
         this.vat_value = CalcNDS.Calculate(nds, cost);
     }
-    public Goods (String name, String sgtin) {
+    public Goods (String sgtin, String name) {
         this.name = name;
         this.sgtin = sgtin;
         this.cost = "0";
