@@ -1,8 +1,8 @@
 public class Goods {
-    String name;
-    String sgtin;
-    String cost;
-    String vat_value;
+    private final String name;
+    private final String sgtin;
+    private final String cost;
+    private final String vat_value;
 
     public Goods (String sgtin, String cost, String nds, String name) {
         this.name = name;

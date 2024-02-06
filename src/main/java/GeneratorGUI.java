@@ -5,6 +5,7 @@ import java.awt.datatransfer.StringSelection;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +40,7 @@ public class GeneratorGUI {
             702 - Оприходование
             """;
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
+    private final String errParserFile = "Ошибка разбора файла с данными";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";
     private final String selectedSchema = "Выбрана схема документа ";
     private JFrame window;
@@ -299,6 +301,7 @@ public class GeneratorGUI {
             String receiverOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(receiverMDBox.getSelectedItem())).getOrg()));
             String senderOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(senderMDBox.getSelectedItem())).getOrg()));
             ExcelReader reader = new ExcelReader();
+            ParserFile2Goods parser = new ParserFile2Goods(logField);
             switch (xmlNumber) {
                 case 0 -> JOptionPane.showMessageDialog(window, "Не выбрана схема документа", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 case 552 -> {
@@ -403,13 +406,16 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            reader.clear();
-                            reader.read(srcFile.getText());
+                            ArrayList<Goods> goods = parser.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate251xml(sender, receiver, dateOperate.getText(), reasonRecall.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate251xml(sender, receiver, dateOperate.getText(), reasonRecall.getText(), goods, logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
+                            JOptionPane.showMessageDialog(window, errParserFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(errParserFile);
                         }
                     }
                     else log(errRqFields);
