@@ -1,8 +1,5 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.HashMap;
+import javax.swing.JTextArea;
 import java.util.List;
-import java.util.Map;
 // класс генерирует документ xml для отзыва части товара отправителем
 public class Generate251xml {
     private final StringBuilder xml;
@@ -19,7 +16,7 @@ public class Generate251xml {
         for (Goods item : goods) {
             xml.append("      <sgtin>").append(item.getSgtin()).append("</sgtin>\n");
             if (!item.getName().equals("no name")) {
-                log.append("Обработан " + item.getName() + "\n");
+                log.append("\nОбработан " + item.getName());
             }
         }
         xml.append("    </order_details>\n" +

@@ -40,7 +40,6 @@ public class GeneratorGUI {
             702 - Оприходование
             """;
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
-    private final String errParserFile = "Ошибка разбора файла с данными";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";
     private final String selectedSchema = "Выбрана схема документа ";
     private JFrame window;
@@ -414,8 +413,8 @@ public class GeneratorGUI {
                             log(errReadExcellFile);
                         }
                         catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, errParserFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(errParserFile);
+                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile2Goods.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -430,13 +429,16 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            reader.clear();
-                            reader.read(srcFile.getText());
+                            ArrayList<Goods> goods = parser.read(srcFile.getText());
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate431xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate431xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), goods, logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile2Goods.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -451,12 +453,16 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            reader.clear();
-                            reader.read(srcFile.getText());
-                            outputField.setText(String.valueOf(new Generate417xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), reader.getData()).getXML()));
+                            ArrayList<Goods> goods = parser.read(srcFile.getText());
+                            log(selectedSchema + xmlNumber);
+                            outputField.setText(String.valueOf(new Generate417xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), goods, logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile);
                             log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile2Goods.getMessage());
                         }
                     }
                     else log(errRqFields);
