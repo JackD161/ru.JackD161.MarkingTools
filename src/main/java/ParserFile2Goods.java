@@ -13,6 +13,7 @@ public class ParserFile2Goods {
         lengthData = 0;
         reader = new ExcelReader();
         goods = new ArrayList<>();
+        map = new HashMap<>();
     }
     public ArrayList<Goods> read(String file) throws ExceptionParseFile2Goods, ExceptiionReadExcellFile {
         reader.read(file);
