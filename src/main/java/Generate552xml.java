@@ -1,7 +1,5 @@
 import javax.swing.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 // класс генерирует документ xml для вывода из оборота товара отправителем
 public class Generate552xml {
