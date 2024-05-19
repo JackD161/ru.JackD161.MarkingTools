@@ -5,7 +5,6 @@ import java.awt.datatransfer.StringSelection;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -265,7 +264,7 @@ public class GeneratorGUI {
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
-                new SaveXMLfile(outFile.getText(), "Document" + xmlNumber + ".xml", outputField.getText());
+                new SaveXMLfile(outFile.getText(), "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml", outputField.getText());
                 JOptionPane.showMessageDialog(window, "Файл сохранен");
                 log("Файл сохранен");
             }
