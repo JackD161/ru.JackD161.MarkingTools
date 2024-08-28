@@ -1,7 +1,5 @@
 import javax.swing.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 // класс генерирует xml для перемещения товара между местами деятельности внутри организации
 public class Generate431xml {
     private final StringBuilder xml;
@@ -23,9 +21,6 @@ public class Generate431xml {
         xml.append("    </order_details>\n" +
                 "  </move_place>\n" +
                 "</documents>");
-    }
-    private void generate() {
-
     }
     public String getXML() {
         return xml.toString();

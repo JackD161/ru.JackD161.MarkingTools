@@ -2,11 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PregnantCertificate {
-    String name;
-    String prescription_num;
-    String prescription_date;
-    String prescription_series;
-    List<Goods> goodsList;
+    private final String name;
+    private final String prescription_num;
+    private final String prescription_date;
+    private final String prescription_series;
+    private final List<Goods> goodsList;
 
     public PregnantCertificate (String prescription_series, String prescription_num, String prescription_date) {
         this.name = prescription_series + prescription_num;

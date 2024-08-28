@@ -264,7 +264,14 @@ public class GeneratorGUI {
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
-                new SaveXMLfile(outFile.getText(), "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml", outputField.getText());
+                String saveFileName = "";
+                if (xmlNumber != 552) {
+                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml";
+                }
+                else {
+                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + ".xml";
+                }
+                new SaveXMLfile(outFile.getText(), saveFileName, outputField.getText());
                 JOptionPane.showMessageDialog(window, "Файл сохранен");
                 log("Файл сохранен");
             }
