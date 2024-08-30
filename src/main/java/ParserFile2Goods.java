@@ -36,11 +36,32 @@ public class ParserFile2Goods {
                     log.append("\nВ файле нет данных для обработки");
                     throw new ExceptionParseFile2Goods("В файле нет данных для обработки");
                 }
-                case 1 -> goods.add(new Goods(String.valueOf(pair.getValue().get(0))));
-                case 2 -> goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1))));
-                case 3 -> goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2))));
-                default -> goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2)), String.valueOf(pair.getValue().get(3))));
+                case 1 -> {
+                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
+                        goods.add(new Goods(String.valueOf(pair.getValue().get(0))));
+
+                }
+                case 2 -> {
+                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
+                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1))));
+                }
+                case 3 -> {
+                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
+                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2))));
+                }
+                default -> {
+                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
+                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2)), String.valueOf(pair.getValue().get(3))));
+                }
             }
         }
+    }
+    private boolean checkDublicateSgtin(String sgtin) {
+        int cnt = 0;
+        for (Goods goodsCh : goods) {
+            if (goodsCh.getSgtin().equals(sgtin))
+                cnt++;
+        }
+        return cnt == 0;
     }
 }

@@ -17,7 +17,7 @@ public class Generate521xml {
                 "    <order_details>");
         for (PrescriptionGoods goods : doc.getGoodsList()) {
             xml.append("      <union>\n" +
-                         "        <sgtin>" + goods.getSgtin() + "</sgtin>\n" +
+                    "        <sgtin>" + goods.getSgtin() + "</sgtin>\n" +
                     "      </union>\n");
         }
                 xml.append("    </order_details>\n" +
