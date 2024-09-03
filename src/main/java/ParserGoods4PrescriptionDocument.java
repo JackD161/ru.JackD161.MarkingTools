@@ -6,12 +6,12 @@ import java.util.Map;
 public class ParserGoods4PrescriptionDocument {
     private final HashMap<String, PrescriptionDocument> prescriptionDocumentsMap;
 
-    public ParserGoods4PrescriptionDocument(String fileName, JTextArea log) {
+    public ParserGoods4PrescriptionDocument(String fileName, JTextArea log) throws ExceptionParseFile2Goods {
         this.prescriptionDocumentsMap = new HashMap<>();
         parseFile(fileName, log);
     }
 
-    private void parseFile(String fileName, JTextArea log) {
+    private void parseFile(String fileName, JTextArea log) throws ExceptionParseFile2Goods {
         ExcelReader reader = new ExcelReader();
         HashMap<Integer, List<Object>> map;
         try {
@@ -19,7 +19,7 @@ public class ParserGoods4PrescriptionDocument {
             map = reader.getData();
             for (Map.Entry<Integer, List<Object>> pair : map.entrySet()) {
                 PrescriptionGoods goods = getPrescriptionGoodsFromRow(pair.getValue());
-                if (checkSgtin(prescriptionDocumentsMap, goods.getSgtin())) {
+                if (checkSgtin(goods.getSgtin())) {
                     if (prescriptionDocumentsMap.containsKey(goods.getPrescriptionName())) {
                         prescriptionDocumentsMap.get(goods.getPrescriptionName()).addGoods(goods);
                     } else {
@@ -33,16 +33,21 @@ public class ParserGoods4PrescriptionDocument {
         }
     }
 
-    private PrescriptionGoods getPrescriptionGoodsFromRow(List<Object> list) {
+    private PrescriptionGoods getPrescriptionGoodsFromRow(List<Object> list) throws ExceptionParseFile2Goods {
         int length = list.size();
+        if (length < 4)
+            throw new ExceptionParseFile2Goods("В файле нет данных для обработки");
+        String sgtin = list.get(3).toString();
+        if (sgtin.startsWith("01"))
+            sgtin = ParserData.ejectSgtin(sgtin);
         return switch (length) {
-            case 4 -> new PrescriptionGoods(list.get(0).toString(), list.get(1).toString(), list.get(2).toString(), list.get(3).toString());
-            default -> new PrescriptionGoods(list.get(0).toString(), list.get(1).toString(), list.get(2).toString(), list.get(3).toString(), list.get(4).toString(), list.get(5).toString(), list.get(6).toString());
+            case 4 -> new PrescriptionGoods(list.get(0).toString(), list.get(1).toString(), list.get(2).toString(), sgtin);
+            default -> new PrescriptionGoods(list.get(0).toString(), list.get(1).toString(), list.get(2).toString(), sgtin, list.get(4).toString(), list.get(5).toString(), list.get(6).toString());
             };
         }
-    private boolean checkSgtin(HashMap<String, PrescriptionDocument> map, String sgtin) {
+    private boolean checkSgtin(String sgtin) {
         int cnt = 0;
-        for (Map.Entry<String, PrescriptionDocument> pair : map.entrySet()) {
+        for (Map.Entry<String, PrescriptionDocument> pair : prescriptionDocumentsMap.entrySet()) {
             List<PrescriptionGoods> goodsList = pair.getValue().getGoodsList();
             for (PrescriptionGoods goods : goodsList) {
                 if (goods.getSgtin().equals(sgtin))
@@ -51,7 +56,7 @@ public class ParserGoods4PrescriptionDocument {
         }
         return cnt == 0;
     }
-    public HashMap<String, PrescriptionDocument> getPrescriptingMap() {
+    public HashMap<String, PrescriptionDocument> getPrescriptionDocumentsMap() {
         return prescriptionDocumentsMap;
     }
 }

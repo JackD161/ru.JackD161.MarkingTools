@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class GeneratorGUI {
     private final String version = """
-            1.5 alpha
+            1.6 alpha
             Разработчик: Холопкин Юрий (JackD161)
             e-mail: holopkin_yurik@mail.ru
             tel: +7-951-827-85-67
@@ -107,7 +107,7 @@ public class GeneratorGUI {
     private final String[] schema415 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "turnoverTypeBox"};
     private final String[] schema702 = {"srcFile", "outFile", "sender", "receiver", "inn", "kpp", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "postingTypeBox"};
     private final String[] schema417 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
-    private final String[] schema512 = {"srcFile", "outFile", "sender", "dateOperate", "docDate"};
+    private final String[] schema512 = {"srcFile", "outFile", "sender", "dateOperate"};
     private final String[] schema552 = {"srcFile", "outFile", "sender", "dateOperate", "docNum", "docDate", "countryCode", "typeWithdrawalBox"};
     private ZonedDateTime time;
     public GeneratorGUI() {
@@ -265,11 +265,11 @@ public class GeneratorGUI {
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
                 String saveFileName = "";
-                if (xmlNumber != 552) {
-                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml";
+                if (xmlNumber == 552 || xmlNumber == 512 || xmlNumber == 521) {
+                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + ".xml";
                 }
                 else {
-                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + ".xml";
+                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml";
                 }
                 new SaveXMLfile(outFile.getText(), saveFileName, outputField.getText());
                 JOptionPane.showMessageDialog(window, "Файл сохранен");
@@ -306,16 +306,16 @@ public class GeneratorGUI {
             String receiverOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(receiverMDBox.getSelectedItem())).getOrg()));
             String senderOrg = (String.valueOf(((AddressesMDEnum) Objects.requireNonNull(senderMDBox.getSelectedItem())).getOrg()));
             ExcelReader reader = new ExcelReader();
-            ParserFile2Goods parser = new ParserFile2Goods(logField);
+            ParserFile2Goods parserGoods = new ParserFile2Goods(logField);
             switch (xmlNumber) {
                 case 0 -> JOptionPane.showMessageDialog(window, "Не выбрана схема документа", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 case 552 -> {
                     if (checkRequiredField(xmlNumber)) {
                         try {
-                            parser.clear();
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
                             String typeWithdrawal = (String.valueOf(((TypeWithdrawalEnum) Objects.requireNonNull(typeWithdrawalBox.getSelectedItem())).getVariable()));
-                            outputField.setText(String.valueOf(new Generate552xml(sender, dateOperate.getText(), docNum.getText(), docDate.getText(), typeWithdrawal, countryCode.getText(), parser.read(srcFile.getText()), logField).getXML()));
+                            outputField.setText(String.valueOf(new Generate552xml(sender, dateOperate.getText(), docNum.getText(), docDate.getText(), typeWithdrawal, countryCode.getText(), parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
@@ -328,18 +328,17 @@ public class GeneratorGUI {
                     else log(errRqFields);
                 }
                 case 512 -> {
-                    if (checkRequiredField(xmlNumber)) {
-                        try {
-                            reader.clear();
-                            reader.read(srcFile.getText());
+                    try {
+                        if (checkRequiredField(xmlNumber)) {
+                            ParserGoods4PrescriptionDocument parserGoods4PrescriptionDocument = new ParserGoods4PrescriptionDocument(srcFile.getText(), logField);
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate512xml(sender, dateOperate.getText(), docDate.getText(), reader.getData()).getXML()));
-                        } catch (ExceptiionReadExcellFile exception) {
-                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(errReadExcellFile);
-                        }
+                            outputField.setText(String.valueOf(new Generate512xml(sender, dateOperate.getText(), parserGoods4PrescriptionDocument.getPrescriptionDocumentsMap()).getXML()));
+                        } else log(errRqFields);
                     }
-                    else log(errRqFields);
+                    catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
+                        JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        log(exceptionParseFile2Goods.getMessage());
+                    }
                 }
                 case 415 -> {
                     if (checkRequiredField(xmlNumber)) {
@@ -393,9 +392,9 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            parser.clear();
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate701xml(sender, receiver, dateOperate.getText(), parser.read(srcFile.getText()), logField).getXML()));
+                            outputField.setText(String.valueOf(new Generate701xml(sender, receiver, dateOperate.getText(), parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
@@ -417,9 +416,9 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            parser.clear();
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate251xml(sender, receiver, dateOperate.getText(), reasonRecall.getText(), parser.read(srcFile.getText()), logField).getXML()));
+                            outputField.setText(String.valueOf(new Generate251xml(sender, receiver, dateOperate.getText(), reasonRecall.getText(), parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
@@ -441,9 +440,9 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            parser.clear();
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate431xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), parser.read(srcFile.getText()), logField).getXML()));
+                            outputField.setText(String.valueOf(new Generate431xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
@@ -465,9 +464,9 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            parser.clear();
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate417xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), parser.read(srcFile.getText()), logField).getXML()));
+                            outputField.setText(String.valueOf(new Generate417xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile);
                             log(errReadExcellFile);
@@ -561,7 +560,6 @@ public class GeneratorGUI {
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
         dateOperateLabel.setText("Дата и время совершения операции");
-        docDateLabel.setText("Дата регистрации документа отпуска");
         window.setTitle("Вывод из оборота с причиной «Отпуск по документу»");
     }
     private void schema701LabelsNaming() {
@@ -839,8 +837,7 @@ public class GeneratorGUI {
         return switch (schema) {
             case 415, 431, 417, 552-> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
             case 251 -> srcFileFlag && dateOperateFlag && reasonRecallFlag;
-            case 701 -> srcFileFlag && dateOperateFlag;
-            case 512 -> srcFileFlag && dateOperateFlag && docDateFlag;
+            case 701, 512 -> srcFileFlag && dateOperateFlag;
             case 702 -> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag;
             default -> throw new IllegalStateException("Неизвестный тип схемы: " + schema);
         };

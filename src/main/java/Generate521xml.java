@@ -23,6 +23,7 @@ public class Generate521xml {
                 xml.append("    </order_details>\n" +
                 "  </recipe>\n" +
                 "</documents>");
+        log.append("Рецепт номер " + doc.getPrescription_num() + " обработан");
     }
     public String getXML() {
         return xml.toString();

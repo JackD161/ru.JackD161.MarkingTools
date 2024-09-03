@@ -31,27 +31,40 @@ public class ParserFile2Goods {
             log.append("\nВ файле больше данных чем нужно, но файл будет обработан, проверьте корректность вывода данных");
         }
         for (Map.Entry<Integer, List<Object>> pair : map.entrySet()) {
+            String sgtin = "";
             switch (lengthData) {
                 case 0 -> {
                     log.append("\nВ файле нет данных для обработки");
                     throw new ExceptionParseFile2Goods("В файле нет данных для обработки");
                 }
                 case 1 -> {
-                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
-                        goods.add(new Goods(String.valueOf(pair.getValue().get(0))));
+                    sgtin = String.valueOf(pair.getValue().get(0));
+                    if (sgtin.startsWith("01"))
+                        sgtin = ParserData.ejectSgtin(sgtin);
+                    if (checkDublicateSgtin(sgtin))
+                        goods.add(new Goods(sgtin));
 
                 }
                 case 2 -> {
-                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
-                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1))));
+                    sgtin = String.valueOf(pair.getValue().get(0));
+                    if (sgtin.startsWith("01"))
+                        sgtin = ParserData.ejectSgtin(sgtin);
+                    if (checkDublicateSgtin(sgtin))
+                        goods.add(new Goods(sgtin, String.valueOf(pair.getValue().get(1))));
                 }
                 case 3 -> {
-                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
-                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2))));
+                    sgtin = String.valueOf(pair.getValue().get(0));
+                    if (sgtin.startsWith("01"))
+                        sgtin = ParserData.ejectSgtin(sgtin);
+                    if (checkDublicateSgtin(sgtin))
+                        goods.add(new Goods(sgtin, String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2))));
                 }
                 default -> {
-                    if (checkDublicateSgtin(String.valueOf(pair.getValue().get(0))))
-                        goods.add(new Goods(String.valueOf(pair.getValue().get(0)), String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2)), String.valueOf(pair.getValue().get(3))));
+                    sgtin = String.valueOf(pair.getValue().get(0));
+                    if (sgtin.startsWith("01"))
+                        sgtin = ParserData.ejectSgtin(sgtin);
+                    if (checkDublicateSgtin(sgtin))
+                        goods.add(new Goods(sgtin, String.valueOf(pair.getValue().get(1)), String.valueOf(pair.getValue().get(2)), String.valueOf(pair.getValue().get(3))));
                 }
             }
         }
