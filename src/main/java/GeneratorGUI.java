@@ -34,6 +34,7 @@ public class GeneratorGUI {
             417 - Возврат приостановленных ЛП
             431 - Перемещение
             512 - Вывод из оборота с причиной «Отпуск по документу»
+            521 - Вывод из оборота по льготному рецепту
             552 - Вывод из оборота
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
@@ -264,7 +265,7 @@ public class GeneratorGUI {
         exit.addActionListener(e -> System.exit(0));
         saveAs.addActionListener(e -> {
             if (!outFile.getText().isBlank()) {
-                String saveFileName = "";
+                String saveFileName;
                 if (xmlNumber == 552 || xmlNumber == 512 || xmlNumber == 521) {
                     saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + ".xml";
                 }
