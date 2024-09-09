@@ -38,6 +38,7 @@ public class GeneratorGUI {
             552 - Вывод из оборота
             701 - Подтверждение отгрузки / приемки
             702 - Оприходование
+            912 - Расформирование групповой упаковки
             """;
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";

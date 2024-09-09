@@ -15,7 +15,7 @@ public class Generate912xml {
                 "    <operation_date>" + dateOperate + "</operation_date>\n");
         for (String sscc : set) {
             xml.append("    <sscc>" + sscc + "</sscc>\n");
-            log.append("Обработано " + sscc);
+            log.append("\nОбработано " + sscc);
         }
                 xml.append("  </unit_unpack>\n" +
                 "</documents>");
@@ -23,13 +23,11 @@ public class Generate912xml {
     private HashSet<String> collectSSCC(HashMap<Integer, List<Object>> mapSSCC) throws ExceptionParseFile {
         HashSet<String> set = new HashSet<>();
         for (Map.Entry<Integer, List<Object>> pair : mapSSCC.entrySet()) {
-            String sscc = pair.getValue().toString();
-            if (sscc.startsWith("00")) {
-                set.add(pair.getValue().toString());
+            if ((pair.getValue()).get(0).toString().length() == 18) {
+                set.add((pair.getValue()).get(0).toString());
             }
             else {
-                System.err.println("Код не соответствует транспортной упаковке");
-                throw new ExceptionParseFile("Код не соответствует транспортной упаковке");
+                throw new ExceptionParseFile("Код не соответствует транспортной упаковке '[0-9]{18}");
             }
         }
         return set;
