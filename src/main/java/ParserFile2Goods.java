@@ -15,7 +15,7 @@ public class ParserFile2Goods {
         goods = new ArrayList<>();
         map = new HashMap<>();
     }
-    public ArrayList<Goods> read(String file) throws ExceptionParseFile2Goods, ExceptiionReadExcellFile {
+    public ArrayList<Goods> read(String file) throws ExceptionParseFile, ExceptiionReadExcellFile {
         reader.read(file);
         map = reader.getData();
         lengthData = map.get(0).size();
@@ -26,7 +26,7 @@ public class ParserFile2Goods {
         goods.clear();
         map.clear();
     }
-    private void extractData() throws ExceptionParseFile2Goods {
+    private void extractData() throws ExceptionParseFile {
         if (lengthData > 4) {
             log.append("\nВ файле больше данных чем нужно, но файл будет обработан, проверьте корректность вывода данных");
         }
@@ -35,7 +35,7 @@ public class ParserFile2Goods {
             switch (lengthData) {
                 case 0 -> {
                     log.append("\nВ файле нет данных для обработки");
-                    throw new ExceptionParseFile2Goods("В файле нет данных для обработки");
+                    throw new ExceptionParseFile("В файле нет данных для обработки");
                 }
                 case 1 -> {
                     sgtin = String.valueOf(pair.getValue().get(0));

@@ -6,12 +6,12 @@ import java.util.Map;
 public class ParserGoods4PrescriptionDocument {
     private final HashMap<String, PrescriptionDocument> prescriptionDocumentsMap;
 
-    public ParserGoods4PrescriptionDocument(String fileName, JTextArea log) throws ExceptionParseFile2Goods {
+    public ParserGoods4PrescriptionDocument(String fileName, JTextArea log) throws ExceptionParseFile {
         this.prescriptionDocumentsMap = new HashMap<>();
         parseFile(fileName, log);
     }
 
-    private void parseFile(String fileName, JTextArea log) throws ExceptionParseFile2Goods {
+    private void parseFile(String fileName, JTextArea log) throws ExceptionParseFile {
         ExcelReader reader = new ExcelReader();
         HashMap<Integer, List<Object>> map;
         try {
@@ -33,10 +33,10 @@ public class ParserGoods4PrescriptionDocument {
         }
     }
 
-    private PrescriptionGoods getPrescriptionGoodsFromRow(List<Object> list) throws ExceptionParseFile2Goods {
+    private PrescriptionGoods getPrescriptionGoodsFromRow(List<Object> list) throws ExceptionParseFile {
         int length = list.size();
         if (length < 4)
-            throw new ExceptionParseFile2Goods("В файле нет данных для обработки");
+            throw new ExceptionParseFile("В файле нет данных для обработки");
         String sgtin = list.get(3).toString();
         if (sgtin.startsWith("01"))
             sgtin = ParserData.ejectSgtin(sgtin);

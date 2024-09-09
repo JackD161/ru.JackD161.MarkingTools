@@ -69,6 +69,7 @@ public class GeneratorGUI {
     private JButton xml417;
     private JButton xml552;
     private JButton xml512;
+    private JButton xml912;
     private JButton dateOperateNow;
     private JButton docDateNow;
     private JButton gosDateNow;
@@ -109,6 +110,7 @@ public class GeneratorGUI {
     private final String[] schema702 = {"srcFile", "outFile", "sender", "receiver", "inn", "kpp", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "postingTypeBox"};
     private final String[] schema417 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
     private final String[] schema512 = {"srcFile", "outFile", "sender", "dateOperate"};
+    private final String[] schema912 = {"srcFile", "outFile", "sender", "dateOperate"};
     private final String[] schema552 = {"srcFile", "outFile", "sender", "dateOperate", "docNum", "docDate", "countryCode", "typeWithdrawalBox"};
     private ZonedDateTime time;
     public GeneratorGUI() {
@@ -151,6 +153,7 @@ public class GeneratorGUI {
         left.add(xml552);
         left.add(xml701);
         left.add(xml702);
+        left.add(xml912);
 
         right.add(new JLabel("Вывод"));
         right.add(scrollOutPane);
@@ -201,6 +204,14 @@ public class GeneratorGUI {
             xml251.setBackground(Color.ORANGE);
             schema251LabelsNaming();
             generateForm(schema251);
+        });
+        xml912.addActionListener(e -> {
+            reset.doClick();
+            xmlNumber = 912;
+            log(selectedSchema + xmlNumber);
+            xml912.setBackground(Color.ORANGE);
+            schema912LabelsNaming();
+            generateForm(schema912);
         });
         xml431.addActionListener(e -> {
             reset.doClick();
@@ -321,9 +332,27 @@ public class GeneratorGUI {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
-                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(exceptionParseFile2Goods.getMessage());
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
+                        }
+                    }
+                    else log(errRqFields);
+                }
+                case 912 -> {
+                    if (checkRequiredField(xmlNumber)) {
+                        try {
+                            reader.clear();
+                            reader.read(srcFile.getText());
+                            log(selectedSchema + xmlNumber);
+                            outputField.setText(String.valueOf(new Generate912xml(sender, dateOperate.getText(), reader.getData(), logField).getXML()));
+                        } catch (ExceptiionReadExcellFile exception) {
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -336,9 +365,9 @@ public class GeneratorGUI {
                             outputField.setText(String.valueOf(new Generate512xml(sender, dateOperate.getText(), parserGoods4PrescriptionDocument.getPrescriptionDocumentsMap()).getXML()));
                         } else log(errRqFields);
                     }
-                    catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                        JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        log(exceptionParseFile2Goods.getMessage());
+                    catch (ExceptionParseFile exceptionParseFile) {
+                        JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        log(exceptionParseFile.getMessage());
                     }
                 }
                 case 415 -> {
@@ -400,9 +429,9 @@ public class GeneratorGUI {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
-                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(exceptionParseFile2Goods.getMessage());
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -424,9 +453,9 @@ public class GeneratorGUI {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
-                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(exceptionParseFile2Goods.getMessage());
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -448,9 +477,9 @@ public class GeneratorGUI {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
                         }
-                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(exceptionParseFile2Goods.getMessage());
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -472,9 +501,9 @@ public class GeneratorGUI {
                             JOptionPane.showMessageDialog(window, errReadExcellFile);
                             log(errReadExcellFile);
                         }
-                        catch (ExceptionParseFile2Goods exceptionParseFile2Goods) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile2Goods.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-                            log(exceptionParseFile2Goods.getMessage());
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -561,7 +590,14 @@ public class GeneratorGUI {
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
         dateOperateLabel.setText("Дата и время совершения операции");
-        window.setTitle("Вывод из оборота с причиной «Отпуск по документу»");
+        window.setTitle("Вывод из оборота с причиной «Отпуск по документу");
+    }
+    private void schema912LabelsNaming() {
+        srcFileLabel.setText("Файл Excell c даннми о отпускаемом товаре");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        dateOperateLabel.setText("Дата расформирования упаковки");
+        window.setTitle("Расформирование групповой упаковки");
     }
     private void schema701LabelsNaming() {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
@@ -672,20 +708,12 @@ public class GeneratorGUI {
         xml417 = new JButton("417");
         xml512 = new JButton("512");
         xml552 = new JButton("552");
+        xml912 = new JButton("912");
         dateOperateNow = new JButton("Сейчас");
         docDateNow = new JButton("Сегодня");
         gosDateNow = new JButton("Сегодня");
-        xml415.setBackground(Color.WHITE);
-        xml701.setBackground(Color.WHITE);
-        xml251.setBackground(Color.WHITE);
-        xml431.setBackground(Color.WHITE);
-        xml702.setBackground(Color.WHITE);
-        xml417.setBackground(Color.WHITE);
-        xml552.setBackground(Color.WHITE);
-        xml512.setBackground(Color.WHITE);
-        confirm.setBackground(Color.GREEN);
-        clipboard.setBackground(Color.MAGENTA);
-        reset.setBackground(Color.RED);
+        bleachingButtons();
+
     }
     private void bleachingFields() {
         for (Map.Entry<String, JTextField> pair : fieldsMap.entrySet()) {
@@ -797,6 +825,10 @@ public class GeneratorGUI {
         xml702.setBackground(Color.white);
         xml552.setBackground(Color.white);
         xml512.setBackground(Color.white);
+        xml912.setBackground(Color.white);
+        confirm.setBackground(Color.GREEN);
+        clipboard.setBackground(Color.MAGENTA);
+        reset.setBackground(Color.RED);
     }
     private boolean checkRequiredField(int schema) {
         boolean srcFileFlag = !srcFile.getText().isBlank();
@@ -838,7 +870,7 @@ public class GeneratorGUI {
         return switch (schema) {
             case 415, 431, 417, 552-> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
             case 251 -> srcFileFlag && dateOperateFlag && reasonRecallFlag;
-            case 701, 512 -> srcFileFlag && dateOperateFlag;
+            case 701, 512, 912 -> srcFileFlag && dateOperateFlag;
             case 702 -> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag;
             default -> throw new IllegalStateException("Неизвестный тип схемы: " + schema);
         };
@@ -870,7 +902,7 @@ public class GeneratorGUI {
             case 702 -> optionFields702();
             case 417 -> optionFields417();
             case 552 -> optionFields552();
-            case 512 -> optionFields512();
+            case 512, 912 -> optionFields512();
             default -> defaultLabelsColor();
         }
         repaint();
