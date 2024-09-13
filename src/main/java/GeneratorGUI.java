@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class GeneratorGUI {
     private final String version = """
-            1.6 alpha
+            1.7 alpha
             Разработчик: Холопкин Юрий (JackD161)
             e-mail: holopkin_yurik@mail.ru
             tel: +7-951-827-85-67
@@ -21,7 +21,7 @@ public class GeneratorGUI {
 
             Позволяет генерировать xml документы наиболее популярных схем для отправки в личном кабинете МДЛП.
             Генератор работает с Excell файлами, из которых читает данные.
-            Для схем 415 и 702 файл должен содержать информацию по колонкам:
+            Для схем 415 , 702 и 441 файл должен содержать информацию по колонкам:
             SGTIN | Цена отгрузки включая налог | НДС 10%/20%
             Для схемы 512 файл должен содержать информацию по колонкам:
             Серия документа | Номер документа | SGTIN или полный КИЗ | Отпускная цена | НДС
@@ -33,6 +33,7 @@ public class GeneratorGUI {
             415 - Отгрузка ЛП со склада
             417 - Возврат приостановленных ЛП
             431 - Перемещение
+            441 - Отгрузка ЛП на незарегистрированное место деятельности
             512 - Вывод из оборота с причиной «Отпуск по документу»
             521 - Вывод из оборота по льготному рецепту
             552 - Вывод из оборота
@@ -68,6 +69,7 @@ public class GeneratorGUI {
     private JButton xml431;
     private JButton xml702;
     private JButton xml417;
+    private JButton xml441;
     private JButton xml552;
     private JButton xml512;
     private JButton xml912;
@@ -109,6 +111,7 @@ public class GeneratorGUI {
     private final String[] schema431 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
     private final String[] schema415 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "turnoverTypeBox"};
     private final String[] schema702 = {"srcFile", "outFile", "sender", "receiver", "inn", "kpp", "dateOperate", "docNum", "docDate", "gosNum", "gosDate", "contractTypeBox", "financeTypeBox", "postingTypeBox"};
+    private final String[] schema441 = {"srcFile", "outFile", "sender", "inn", "kpp", "dateOperate", "docNum", "docDate", "contractTypeBox"};
     private final String[] schema417 = {"srcFile", "outFile", "sender", "receiver", "dateOperate", "docNum", "docDate"};
     private final String[] schema512 = {"srcFile", "outFile", "sender", "dateOperate"};
     private final String[] schema912 = {"srcFile", "outFile", "sender", "dateOperate"};
@@ -150,6 +153,7 @@ public class GeneratorGUI {
         left.add(xml415);
         left.add(xml417);
         left.add(xml431);
+        left.add(xml441);
         left.add(xml512);
         left.add(xml552);
         left.add(xml701);
@@ -181,6 +185,14 @@ public class GeneratorGUI {
             xml415.setBackground(Color.ORANGE);
             schema415LabelsNaming();
             generateForm(schema415);
+        });
+        xml441.addActionListener(e -> {
+            reset.doClick();
+            xmlNumber = 441;
+            log(selectedSchema + xmlNumber);
+            xml441.setBackground(Color.ORANGE);
+            schema441LabelsNaming();
+            generateForm(schema441);
         });
         xml552.addActionListener(e -> {
             reset.doClick();
@@ -281,6 +293,9 @@ public class GeneratorGUI {
                 if (xmlNumber == 552 || xmlNumber == 512 || xmlNumber == 521) {
                     saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + ".xml";
                 }
+                else if (xmlNumber == 441) {
+                    saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + inn.getText() + ".xml";
+                }
                 else {
                     saveFileName = "Document" + xmlNumber + "-" + senderMDBox.getSelectedItem().toString() + "---" + receiverMDBox.getSelectedItem().toString() + ".xml";
                 }
@@ -371,6 +386,23 @@ public class GeneratorGUI {
                         log(exceptionParseFile.getMessage());
                     }
                 }
+                case 441 -> {
+                    if (checkRequiredField(xmlNumber)) {
+                        try {
+                            parserGoods.clear();
+                            log(selectedSchema + xmlNumber);
+                            outputField.setText(String.valueOf(new Generate441xml(sender, inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), contractTypeTeg, parserGoods.read(srcFile.getText()), logField).getXML()));
+                        } catch (ExceptiionReadExcellFile exception) {
+                            JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
+                        }
+                    }
+                    else log(errRqFields);
+                }
                 case 415 -> {
                     if (checkRequiredField(xmlNumber)) {
                         if (dictMDreceiver && dictMDsenser) {
@@ -381,13 +413,16 @@ public class GeneratorGUI {
                             }
                         }
                             try {
-                                reader.clear();
-                                reader.read(srcFile.getText());
+                                parserGoods.clear();
                                 log(selectedSchema + xmlNumber);
-                                outputField.setText(String.valueOf(new Generate415xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, turnoverTypeTeg, reader.getData()).getXML()));
+                                outputField.setText(String.valueOf(new Generate415xml(sender, receiver, dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, turnoverTypeTeg, parserGoods.read(srcFile.getText()), logField).getXML()));
                             } catch (ExceptiionReadExcellFile exception) {
                                 JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                                 log(errReadExcellFile);
+                            }
+                            catch (ExceptionParseFile exceptionParseFile) {
+                                JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                log(exceptionParseFile.getMessage());
                             }
                     }
                     else log(errRqFields);
@@ -402,13 +437,16 @@ public class GeneratorGUI {
                             }
                         }
                         try {
-                            reader.clear();
-                            reader.read(srcFile.getText());
+                            parserGoods.clear();
                             log(selectedSchema + xmlNumber);
-                            outputField.setText(String.valueOf(new Generate702xml(sender, receiver, inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, postingTypeTeg, reader.getData()).getXML()));
+                            outputField.setText(String.valueOf(new Generate702xml(sender, receiver, inn.getText(), kpp.getText(), dateOperate.getText(), docNum.getText(), docDate.getText(), gosNum.getText(), gosDate.getText(), contractTypeTeg, financeTypeTeg, postingTypeTeg, parserGoods.read(srcFile.getText()), logField).getXML()));
                         } catch (ExceptiionReadExcellFile exception) {
                             JOptionPane.showMessageDialog(window, errReadExcellFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(errReadExcellFile);
+                        }
+                        catch (ExceptionParseFile exceptionParseFile) {
+                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptionParseFile.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -550,6 +588,18 @@ public class GeneratorGUI {
         financeTypeLabelBox.setText("Источник финансирования");
         postingTypeLabelBox.setText("Тип операции оприходования");
         window.setTitle("Оприходование");
+    }
+    private void schema441LabelsNaming() {
+        srcFileLabel.setText("Файл Excell cо списком SGTIN и приходными ценами");
+        outFileLAbel.setText("Путь куда сохранить созданный файл");
+        senderMDLabel.setText("Идентификатор организации-отправителя");
+        innLabel.setText("ИНН организации-грузополучателя");
+        kppLabel.setText("КПП организации-грузополучателя");
+        dateOperateLabel.setText("Дата совершения операции");
+        docNumLabel.setText("Реквизиты документа основания: номер документа");
+        docDateLabel.setText("Реквизиты документа основания: дата документа");
+        contractTypeLabelBox.setText("Тип договора");
+        window.setTitle("Отгрузка ЛП на незарегистрированное место деятельности");
     }
     private void schema251LabelsNaming() {
         srcFileLabel.setText("Файл Excell cо списком SGTIN");
@@ -707,6 +757,7 @@ public class GeneratorGUI {
         xml431 = new JButton("431");
         xml702 = new JButton("702");
         xml417 = new JButton("417");
+        xml441 = new JButton("441");
         xml512 = new JButton("512");
         xml552 = new JButton("552");
         xml912 = new JButton("912");
@@ -817,12 +868,19 @@ public class GeneratorGUI {
         outFileLAbel.setForeground(Color.GRAY);
         outFileLAbel.setToolTipText("Не обязательное поле");
     }
+    private void optionFields441() {
+        senderMD.setForeground(Color.GRAY);
+        senderMD.setToolTipText("Не обязательное поле");
+        outFileLAbel.setForeground(Color.GRAY);
+        outFileLAbel.setToolTipText("Не обязательное поле");
+    }
     private void bleachingButtons() {
         xml415.setBackground(Color.white);
         xml417.setBackground(Color.white);
         xml701.setBackground(Color.white);
         xml251.setBackground(Color.white);
         xml431.setBackground(Color.white);
+        xml441.setBackground(Color.white);
         xml702.setBackground(Color.white);
         xml552.setBackground(Color.white);
         xml512.setBackground(Color.white);
@@ -840,6 +898,7 @@ public class GeneratorGUI {
         boolean docDateFlag = !docDate.getText().isBlank();
         boolean reasonRecallFlag = !reasonRecall.getText().isBlank();
         boolean innFlag = !inn.getText().isBlank();
+        boolean kppFlag = !kpp.getText().isBlank();
         if (!srcFileFlag) srcFile.setBackground(Color.RED);
         else srcFile.setBackground(Color.WHITE);
         if (!senderMdFlag) {
@@ -868,11 +927,14 @@ public class GeneratorGUI {
         else reasonRecall.setBackground(Color.WHITE);
         if (!innFlag) inn.setBackground(Color.RED);
         else inn.setBackground(Color.WHITE);
+        if (!kppFlag) kpp.setBackground(Color.RED);
+        else kpp.setBackground(Color.WHITE);
         return switch (schema) {
             case 415, 431, 417, 552-> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
             case 251 -> srcFileFlag && dateOperateFlag && reasonRecallFlag;
             case 701, 512, 912 -> srcFileFlag && dateOperateFlag;
             case 702 -> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag;
+            case 441 -> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag && innFlag && kppFlag;
             default -> throw new IllegalStateException("Неизвестный тип схемы: " + schema);
         };
     }
@@ -902,6 +964,7 @@ public class GeneratorGUI {
             case 431 -> optionFields431();
             case 702 -> optionFields702();
             case 417 -> optionFields417();
+            case 441 -> optionFields441();
             case 552 -> optionFields552();
             case 512, 912 -> optionFields512();
             default -> defaultLabelsColor();

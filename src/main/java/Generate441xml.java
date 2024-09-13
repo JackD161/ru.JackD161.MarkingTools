@@ -1,0 +1,41 @@
+import javax.swing.*;
+import java.util.List;
+
+// класс генерирует xml для отгрузки товара на незарегистрированное МД
+public class Generate441xml {
+    private final StringBuilder xml;
+    public Generate441xml(String senderMD, String inn, String kpp, String dateOperate, String docNum, String docDate, String contractType, List<Goods> goods, JTextArea log) {
+        this.xml = new StringBuilder();
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+        xml.append("<documents version=\"1.38\">\n");
+        xml.append("  <move_unregistered_order action_id=\"441\">\n");
+        xml.append("    <subject_id>" + senderMD + "</subject_id>\n");
+        xml.append("    <operation_date>" + dateOperate + "</operation_date>\n");
+        xml.append("    <receiver_info>\n");
+        xml.append("      <receiver_inn>\n");
+        xml.append("        <ul>\n");
+        xml.append("          <inn>" + inn + "</inn>\n");
+        xml.append("          <kpp>" + kpp + "</kpp>\n");
+        xml.append("        </ul>\n");
+        xml.append("      </receiver_inn>\n");
+        xml.append("    </receiver_info>\n");
+        xml.append("    <contract_type>" + contractType + "</contract_type>\n");
+        xml.append("    <doc_num>" + docNum + "</doc_num>\n");
+        xml.append("    <doc_date>" + docDate + "</doc_date>\n");
+        xml.append("    <order_details>\n");
+        for (Goods goodsItem : goods) {
+            xml.append("      <union>\n");
+            xml.append("        <sgtin>" + goodsItem.getSgtin() + "</sgtin>\n");
+            xml.append("        <cost>" + goodsItem.getCost() + "</cost>\n");
+            xml.append("        <vat_value>" + goodsItem.getVat_value() + "</vat_value>\n");
+            xml.append("      </union>\n");
+            log.append("\nОбработано " + goodsItem.getName());
+        }
+        xml.append("    </order_details>\n");
+        xml.append("  </move_unregistered_order>\n");
+        xml.append("</documents>");
+    }
+    public String getXML() {
+        return xml.toString();
+    }
+}
