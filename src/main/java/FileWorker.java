@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
-// класс читает и пишет текстовые файлы
+
 public class FileWorker {
     private final ArrayList<String> readStrings = new ArrayList<>();
     public void parseKIZ(String outputFile) {

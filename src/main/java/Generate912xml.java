@@ -1,24 +1,23 @@
 import javax.swing.*;
 import java.util.*;
 
-// класс генерирует документ xml для вывода из оборота товара по льготному рецепту
 public class Generate912xml {
     private final StringBuilder xml;
 
     public Generate912xml(String senderMD, String dateOperate, HashMap<Integer, List<Object>> mapSSCC, JTextArea log) throws ExceptionParseFile {
         xml = new StringBuilder();
         HashSet<String> set = collectSSCC(mapSSCC);
-        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<documents version=\"1.38\">\n" +
-                "  <unit_unpack action_id=\"912\">\n" +
-                "    <subject_id>" + senderMD + "</subject_id>\n" +
-                "    <operation_date>" + dateOperate + "</operation_date>\n");
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+        xml.append("<documents version=\"1.38\">\n");
+        xml.append("  <unit_unpack action_id=\"912\">\n");
+        xml.append("    <subject_id>" + senderMD + "</subject_id>\n");
+        xml.append("    <operation_date>" + dateOperate + "</operation_date>\n");
         for (String sscc : set) {
             xml.append("    <sscc>" + sscc + "</sscc>\n");
             log.append("\nОбработано " + sscc);
         }
-                xml.append("  </unit_unpack>\n" +
-                "</documents>");
+        xml.append("  </unit_unpack>\n");
+        xml.append("</documents>");
     }
     private HashSet<String> collectSSCC(HashMap<Integer, List<Object>> mapSSCC) throws ExceptionParseFile {
         HashSet<String> set = new HashSet<>();

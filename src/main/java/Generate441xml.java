@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.util.List;
 
-// класс генерирует xml для отгрузки товара на незарегистрированное МД
 public class Generate441xml {
     private final StringBuilder xml;
     public Generate441xml(String senderMD, String inn, String kpp, String dateOperate, String docNum, String docDate, String contractType, List<Goods> goods, JTextArea log) {
@@ -23,13 +22,15 @@ public class Generate441xml {
         xml.append("    <doc_num>" + docNum + "</doc_num>\n");
         xml.append("    <doc_date>" + docDate + "</doc_date>\n");
         xml.append("    <order_details>\n");
-        for (Goods goodsItem : goods) {
+        for (Goods item : goods) {
             xml.append("      <union>\n");
-            xml.append("        <sgtin>" + goodsItem.getSgtin() + "</sgtin>\n");
-            xml.append("        <cost>" + goodsItem.getCost() + "</cost>\n");
-            xml.append("        <vat_value>" + goodsItem.getVat_value() + "</vat_value>\n");
+            xml.append("        <sgtin>" + item.getSgtin() + "</sgtin>\n");
+            xml.append("        <cost>" + item.getCost() + "</cost>\n");
+            xml.append("        <vat_value>" + item.getVatValue() + "</vat_value>\n");
             xml.append("      </union>\n");
-            log.append("\nОбработано " + goodsItem.getName());
+            if (!item.getName().equals("no name")) {
+                log.append("\nОбработан " + item.getName());
+            }
         }
         xml.append("    </order_details>\n");
         xml.append("  </move_unregistered_order>\n");

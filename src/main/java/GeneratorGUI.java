@@ -117,6 +117,7 @@ public class GeneratorGUI {
     private final String[] schema912 = {"srcFile", "outFile", "sender", "dateOperate"};
     private final String[] schema552 = {"srcFile", "outFile", "sender", "dateOperate", "docNum", "docDate", "countryCode", "typeWithdrawalBox"};
     private ZonedDateTime time;
+
     public GeneratorGUI() {
         initFrame();
         window.setBounds(300, 100, 930, 820);

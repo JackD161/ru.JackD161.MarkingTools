@@ -21,13 +21,15 @@ public class Generate415xml {
             xml.append("    <contract_gos_date>" + gosDate + "</contract_gos_date>\n");
         }
         xml.append("    <order_details>\n");
-        for (Goods goodsItem : goods) {
+        for (Goods item : goods) {
             xml.append("      <union>\n");
-            xml.append("        <sgtin>" + goodsItem.getSgtin() + "</sgtin>\n");
-            xml.append("        <cost>" + goodsItem.getCost() + "</cost>\n");
-            xml.append("        <vat_value>" + goodsItem.getVat_value() + "</vat_value>\n");
+            xml.append("        <sgtin>" + item.getSgtin() + "</sgtin>\n");
+            xml.append("        <cost>" + item.getCost() + "</cost>\n");
+            xml.append("        <vat_value>" + item.getVatValue() + "</vat_value>\n");
             xml.append("      </union>\n");
-            log.append("\nОбработано " + goodsItem.getName());
+            if (!item.getName().equals("no name")) {
+                log.append("\nОбработан " + item.getName());
+            }
         }
         xml.append("    </order_details>\n");
         xml.append("  </move_order>\n");

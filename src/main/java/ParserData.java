@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-// статический класс разделяющий переданный КИЗ на составные части
+
 public final class ParserData {
     private static String parseKIZ(String string) {
         if (string.startsWith("01")) {

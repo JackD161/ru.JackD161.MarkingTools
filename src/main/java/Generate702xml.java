@@ -1,6 +1,6 @@
 import javax.swing.*;
 import java.util.List;
-// класс генерирует xml для оприходования товара на склад
+
 public class Generate702xml {
     private final StringBuilder xml;
 
@@ -34,7 +34,7 @@ public class Generate702xml {
             xml.append("      <union>\n");
             xml.append("        <sgtin>" + goodItem.getSgtin() + "</sgtin>\n");
             xml.append("        <cost>" + goodItem.getCost() + "</cost>\n");
-            xml.append("        <vat_value>" + goodItem.getVat_value() + "</vat_value>\n");
+            xml.append("        <vat_value>" + goodItem.getVatValue() + "</vat_value>\n");
             xml.append("      </union>\n");
             log.append("\nОбработано " + goodItem.getName());
         }

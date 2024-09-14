@@ -1,6 +1,6 @@
 import java.io.FileWriter;
 import java.io.IOException;
-// класс сохраняет сформированный документ в xml файл
+
 public class SaveXMLfile {
     private final String path;
     private final String fileName;

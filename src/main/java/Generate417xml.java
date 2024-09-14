@@ -1,6 +1,6 @@
 import javax.swing.JTextArea;
 import java.util.List;
-// класс генерирует xml для возврата приостановленного товара поставщику
+
 public class Generate417xml {
     private final StringBuilder xml;
     public Generate417xml(String senderMD, String receiverMD, String dateOperate, String docNum, String docDate, List<Goods> goods, JTextArea log) {
@@ -16,7 +16,9 @@ public class Generate417xml {
                 "    <order_details>\n");
         for (Goods item : goods) {
             xml.append("      <sgtin>").append(item.getSgtin()).append("</sgtin>\n");
-            log.append("\nОбработано " + item.getName());
+            if (!item.getName().equals("no name")) {
+                log.append("\nОбработан " + item.getName());
+            }
         }
         xml.append("    </order_details>\n" +
                 "  </move_return>\n" +

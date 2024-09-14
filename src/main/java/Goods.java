@@ -41,7 +41,7 @@ public class Goods {
         return cost;
     }
 
-    public String getVat_value() {
+    public String getVatValue() {
         return vat_value;
     }
 }
