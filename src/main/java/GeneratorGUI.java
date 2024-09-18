@@ -44,6 +44,13 @@ public class GeneratorGUI {
     private final String errReadExcellFile = "Ошибка чтения файла с SGTIN";
     private final String errRqFields = "Не заполнены обязательные поля для формирования документа";
     private final String selectedSchema = "Выбрана схема документа ";
+    private final String exContractType441 = """
+            Для 441 схемы возможно указание только следующих типов договора (contract_type):
+            1 - купля продажи
+            2 - комиссия
+            3 - агентский договор
+            4 - передача на безвозмездной основе
+            Рекомендуем внести изменения в документ и повторить операцию вновь""";
     private JFrame window;
     private JLabel srcFileLabel;
     private JTextField srcFile;
@@ -398,8 +405,12 @@ public class GeneratorGUI {
                             log(errReadExcellFile);
                         }
                         catch (ExceptionParseFile exceptionParseFile) {
-                            JOptionPane.showMessageDialog(window, exceptionParseFile.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(window, exceptionParseFile, "Ошибка", JOptionPane.ERROR_MESSAGE);
                             log(exceptionParseFile.getMessage());
+                        }
+                        catch (ExceptiionContractType441 exceptiionContractType441) {
+                            JOptionPane.showMessageDialog(window, exContractType441, "Ошибка", JOptionPane.ERROR_MESSAGE);
+                            log(exceptiionContractType441.getMessage());
                         }
                     }
                     else log(errRqFields);
@@ -591,7 +602,7 @@ public class GeneratorGUI {
         window.setTitle("Оприходование");
     }
     private void schema441LabelsNaming() {
-        srcFileLabel.setText("Файл Excell cо списком SGTIN и приходными ценами");
+        srcFileLabel.setText("Файл Excell cо списком SGTIN и отпускными ценами");
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
         innLabel.setText("ИНН организации-грузополучателя");
@@ -599,7 +610,7 @@ public class GeneratorGUI {
         dateOperateLabel.setText("Дата совершения операции");
         docNumLabel.setText("Реквизиты документа основания: номер документа");
         docDateLabel.setText("Реквизиты документа основания: дата документа");
-        contractTypeLabelBox.setText("Тип договора");
+        contractTypeLabelBox.setText("Тип договора (разрешены только 1 - 4 пункты)");
         window.setTitle("Отгрузка ЛП на незарегистрированное место деятельности");
     }
     private void schema251LabelsNaming() {
@@ -645,7 +656,7 @@ public class GeneratorGUI {
         window.setTitle("Вывод из оборота с причиной «Отпуск по документу");
     }
     private void schema912LabelsNaming() {
-        srcFileLabel.setText("Файл Excell c даннми о отпускаемом товаре");
+        srcFileLabel.setText("Файл Excell c номерами транспортных упаковок");
         outFileLAbel.setText("Путь куда сохранить созданный файл");
         senderMDLabel.setText("Идентификатор организации-отправителя");
         dateOperateLabel.setText("Дата расформирования упаковки");
@@ -928,8 +939,10 @@ public class GeneratorGUI {
         else reasonRecall.setBackground(Color.WHITE);
         if (!innFlag) inn.setBackground(Color.RED);
         else inn.setBackground(Color.WHITE);
-        if (!kppFlag) kpp.setBackground(Color.RED);
-        else kpp.setBackground(Color.WHITE);
+        if (xmlNumber == 441) {
+            if (!kppFlag) kpp.setBackground(Color.RED);
+            else kpp.setBackground(Color.WHITE);
+        }
         return switch (schema) {
             case 415, 431, 417, 552-> srcFileFlag && dateOperateFlag && docNumFlag && docDateFlag;
             case 251 -> srcFileFlag && dateOperateFlag && reasonRecallFlag;
